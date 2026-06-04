@@ -25,8 +25,14 @@ export const ensureAdminUser = createServerFn({ method: "POST" }).handler(async 
       password: ADMIN_PASSWORD,
       email_confirm: true,
     });
-    if (error) throw new Error(error.message);
-    user = data.user!;
+    if (error) {
+      // Race / already exists — re-fetch
+      const { data: list2 } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
+      user = list2?.users.find((u) => u.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+      if (!user) throw new Error(error.message);
+    } else {
+      user = data.user!;
+    }
   }
 
   // Ensure admin role
