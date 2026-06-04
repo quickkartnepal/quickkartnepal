@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Mail, MessageCircle } from "lucide-react";
+import { Instagram, Mail, MessageCircle, Music2 } from "lucide-react";
 
 export function Footer() {
   return (
@@ -20,6 +20,7 @@ export function Footer() {
             <li><Link to="/" className="hover:text-primary">Home</Link></li>
             <li><Link to="/cart" className="hover:text-primary">Cart</Link></li>
             <li><Link to="/about" className="hover:text-primary">About Us</Link></li>
+            <li><Link to="/account" className="hover:text-primary">My Account</Link></li>
           </ul>
         </div>
         <div>
@@ -32,16 +33,37 @@ export function Footer() {
         <div>
           <div className="mb-3 text-sm font-semibold">Get in touch</div>
           <ul className="space-y-2 text-sm">
-            <li className="flex items-center gap-2"><MessageCircle className="h-4 w-4" /> WhatsApp: 9807470285</li>
-            <li className="flex items-center gap-2"><MessageCircle className="h-4 w-4" /> WhatsApp: 9802649094</li>
-            <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> infoquickkartnepal@gmail.com</li>
-            <li className="flex items-center gap-2"><Instagram className="h-4 w-4" /> @quickkart_nepal</li>
+            <li>
+              <a href="https://wa.me/9779807470285" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-primary">
+                <MessageCircle className="h-4 w-4" /> <span>WhatsApp: 9807470285</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://wa.me/9779802649094" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-primary">
+                <MessageCircle className="h-4 w-4" /> <span>WhatsApp: 9802649094</span>
+              </a>
+            </li>
+            <li>
+              <a href="mailto:infoquickkartnepal@gmail.com" className="inline-flex items-center gap-2 hover:text-primary">
+                <Mail className="h-4 w-4" /> <span>infoquickkartnepal@gmail.com</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://instagram.com/quickkart_nepal" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-primary">
+                <Instagram className="h-4 w-4" /> <span>@quickkart_nepal</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://www.tiktok.com/@quickkart_nepal" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-primary">
+                <Music2 className="h-4 w-4" /> <span>@quickkart_nepal</span>
+              </a>
+            </li>
           </ul>
         </div>
       </div>
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-muted-foreground md:flex-row">
-          <div>© {new Date().getFullYear()} Quick Kart Nepal. All rights reserved.</div>
+          <div>© {new Date().getFullYear()} Quick Kart Nepal. All rights reserved. Website developed by Suraj Bishwokarma.</div>
           <Link to="/admin/login" className="opacity-60 transition hover:opacity-100 hover:text-primary">
             Admin
           </Link>

@@ -6,16 +6,11 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 const ADMIN_EMAIL = "infoquickkartnepal@gmail.com";
 const ADMIN_PASSWORD = "Rgsbqkno$777";
 
-/**
- * Idempotently ensures the configured admin user exists and has the admin role.
- * Safe to call from the public admin-login page so the owner can log in first time.
- */
+// 50-year signed URL (effectively permanent for our needs)
+const SIGNED_URL_TTL = 60 * 60 * 24 * 365 * 50;
+
 export const ensureAdminUser = createServerFn({ method: "POST" }).handler(async () => {
-  // Find existing user
-  const { data: list, error: listErr } = await supabaseAdmin.auth.admin.listUsers({
-    page: 1,
-    perPage: 200,
-  });
+  const { data: list, error: listErr } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
   if (listErr) throw new Error(listErr.message);
   let user = list.users.find((u) => u.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase());
 
@@ -26,7 +21,6 @@ export const ensureAdminUser = createServerFn({ method: "POST" }).handler(async 
       email_confirm: true,
     });
     if (error) {
-      // Race / already exists — re-fetch
       const { data: list2 } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
       user = list2?.users.find((u) => u.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase());
       if (!user) throw new Error(error.message);
@@ -35,29 +29,12 @@ export const ensureAdminUser = createServerFn({ method: "POST" }).handler(async 
     }
   }
 
-  // Ensure admin role
   const { error: roleErr } = await supabaseAdmin
     .from("user_roles")
     .upsert({ user_id: user.id, role: "admin" }, { onConflict: "user_id,role" });
   if (roleErr) throw new Error(roleErr.message);
 
   return { ok: true };
-});
-
-const productSchema = z.object({
-  id: z.string().uuid().optional(),
-  name: z.string().min(1).max(200),
-  slug: z.string().min(1).max(200).regex(/^[a-z0-9-]+$/),
-  description: z.string().max(5000).default(""),
-  price: z.number().min(0),
-  discount_price: z.number().min(0).nullable().optional(),
-  images: z.array(z.string().url()).max(10).default([]),
-  video_url: z.string().url().nullable().optional(),
-  rating: z.number().min(0).max(5).default(4.5),
-  category: z.string().max(80).nullable().optional(),
-  is_featured: z.boolean().default(false),
-  is_trending: z.boolean().default(false),
-  is_active: z.boolean().default(true),
 });
 
 async function assertAdmin(supabase: any, userId: string) {
@@ -71,6 +48,69 @@ async function assertAdmin(supabase: any, userId: string) {
   if (!data) throw new Error("Forbidden: admin access required");
 }
 
+// --- Storage uploads (signed-upload flow) -------------------------
+const BUCKETS = ["product-images", "product-videos", "banners"] as const;
+type Bucket = (typeof BUCKETS)[number];
+
+export const createSignedUpload = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        bucket: z.enum(BUCKETS),
+        filename: z.string().min(1).max(200),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const safe = data.filename.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safe}`;
+    const { data: signed, error } = await supabaseAdmin.storage
+      .from(data.bucket)
+      .createSignedUploadUrl(path);
+    if (error) throw new Error(error.message);
+    return { path: signed.path, token: signed.token, bucket: data.bucket };
+  });
+
+export const getSignedDownload = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ bucket: z.enum(BUCKETS), path: z.string().min(1).max(400) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { data: signed, error } = await supabaseAdmin.storage
+      .from(data.bucket)
+      .createSignedUrl(data.path, SIGNED_URL_TTL);
+    if (error) throw new Error(error.message);
+    return { url: signed.signedUrl };
+  });
+
+// --- Products -----------------------------------------------------
+const productSchema = z.object({
+  id: z.string().uuid().optional(),
+  name: z.string().min(1).max(200),
+  description: z.string().max(5000).default(""),
+  price: z.number().min(0),
+  discount_price: z.number().min(0).nullable().optional(),
+  images: z.array(z.string().url()).max(10).default([]),
+  video_url: z.string().url().nullable().optional(),
+  category: z.string().max(80).nullable().optional(),
+  is_featured: z.boolean().default(false),
+  is_trending: z.boolean().default(false),
+  is_active: z.boolean().default(true),
+});
+
+function toSlug(name: string) {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 80);
+}
+
 export const upsertProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => productSchema.parse(input))
@@ -82,9 +122,23 @@ export const upsertProduct = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
       return { id };
     }
+    // Generate unique slug from name
+    let base = toSlug(rest.name) || "product";
+    let slug = base;
+    let i = 1;
+    while (true) {
+      const { data: existing } = await supabaseAdmin
+        .from("products")
+        .select("id")
+        .eq("slug", slug)
+        .maybeSingle();
+      if (!existing) break;
+      i += 1;
+      slug = `${base}-${i}`;
+    }
     const { data: created, error } = await supabaseAdmin
       .from("products")
-      .insert(rest)
+      .insert({ ...rest, slug })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
@@ -101,6 +155,7 @@ export const deleteProduct = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// --- Orders -------------------------------------------------------
 export const listOrdersAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -113,18 +168,12 @@ export const listOrdersAdmin = createServerFn({ method: "GET" })
     const ids = (orders ?? []).map((o) => o.id);
     let items: any[] = [];
     if (ids.length) {
-      const { data: it, error: e2 } = await supabaseAdmin
-        .from("order_items")
-        .select("*")
-        .in("order_id", ids);
+      const { data: it, error: e2 } = await supabaseAdmin.from("order_items").select("*").in("order_id", ids);
       if (e2) throw new Error(e2.message);
       items = it ?? [];
     }
     return {
-      orders: (orders ?? []).map((o) => ({
-        ...o,
-        items: items.filter((i) => i.order_id === o.id),
-      })),
+      orders: (orders ?? []).map((o) => ({ ...o, items: items.filter((i) => i.order_id === o.id) })),
     };
   });
 
@@ -140,10 +189,105 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
-    const { error } = await supabaseAdmin
-      .from("orders")
-      .update({ status: data.status })
-      .eq("id", data.id);
+    const { error } = await supabaseAdmin.from("orders").update({ status: data.status }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// --- Banners ------------------------------------------------------
+const bannerSchema = z.object({
+  id: z.string().uuid().optional(),
+  image_url: z.string().url(),
+  link_url: z.string().url().nullable().optional(),
+  title: z.string().max(200).default(""),
+  sort_order: z.number().int().default(0),
+  is_active: z.boolean().default(true),
+});
+
+export const upsertBanner = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => bannerSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { id, ...rest } = data;
+    if (id) {
+      const { error } = await supabaseAdmin.from("banners").update(rest).eq("id", id);
+      if (error) throw new Error(error.message);
+      return { id };
+    }
+    const { data: created, error } = await supabaseAdmin
+      .from("banners")
+      .insert(rest)
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    return { id: created.id };
+  });
+
+export const deleteBanner = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { error } = await supabaseAdmin.from("banners").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// --- Promo codes --------------------------------------------------
+const promoSchema = z.object({
+  id: z.string().uuid().optional(),
+  code: z.string().min(2).max(40).regex(/^[A-Za-z0-9_-]+$/),
+  discount_type: z.enum(["percent", "fixed"]),
+  discount_value: z.number().min(0),
+  min_subtotal: z.number().min(0).default(0),
+  usage_limit: z.number().int().min(0).nullable().optional(),
+  expires_at: z.string().nullable().optional(),
+  is_active: z.boolean().default(true),
+});
+
+export const upsertPromo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => promoSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { id, ...rest } = data;
+    const payload = { ...rest, code: rest.code.toUpperCase() };
+    if (id) {
+      const { error } = await supabaseAdmin.from("promo_codes").update(payload).eq("id", id);
+      if (error) throw new Error(error.message);
+      return { id };
+    }
+    const { data: created, error } = await supabaseAdmin
+      .from("promo_codes")
+      .insert(payload)
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    return { id: created.id };
+  });
+
+export const deletePromo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { error } = await supabaseAdmin.from("promo_codes").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// --- Admin password change ---------------------------------------
+export const changeAdminPassword = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ new_password: z.string().min(8).max(72) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(context.userId, {
+      password: data.new_password,
+    });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
