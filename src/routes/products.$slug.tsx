@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
 import { Star, Truck, BadgeCheck, ShoppingCart, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
@@ -22,6 +23,7 @@ function ProductPage() {
   const { slug } = Route.useParams();
   const nav = useNavigate();
   const { add } = useCart();
+  const { user } = useAuth();
   const submit = useServerFn(submitReview);
 
   const { data: product, isLoading } = useQuery({
@@ -79,7 +81,7 @@ function ProductPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await submit({ data: { product_id: product.id, name: rName, rating: rRating, comment: rComment } });
+      await submit({ data: { product_id: product.id, name: rName, rating: rRating, comment: rComment, user_id: user?.id ?? null } });
       toast.success("Thanks for your review!");
       setRName(""); setRComment(""); setRRating(5);
       refetch();
