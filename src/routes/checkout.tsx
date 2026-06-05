@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useCart } from "@/lib/cart";
 import { useServerFn } from "@tanstack/react-start";
 import { placeOrder, validatePromo } from "@/lib/shop.functions";
@@ -7,6 +7,7 @@ import { getMyProfile } from "@/lib/user.functions";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { BadgeCheck, Truck, Tag } from "lucide-react";
+import { PROVINCES, districtsOf, municipalitiesOf } from "@/lib/nepal-address";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [{ title: "Checkout — Quick Kart Nepal" }] }),
@@ -20,7 +21,18 @@ function CheckoutPage() {
   const validate = useServerFn(validatePromo);
   const profileFn = useServerFn(getMyProfile);
   const { user } = useAuth();
-  const [form, setForm] = useState({ full_name: "", phone: "", address: "", notes: "" });
+  const [form, setForm] = useState({
+    full_name: "",
+    phone: "",
+    province: "",
+    district: "",
+    municipality: "",
+    ward: "",
+    tole: "",
+    address: "",
+    maps_link: "",
+    notes: "",
+  });
   const [busy, setBusy] = useState(false);
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState<{ code: string; discount: number } | null>(null);
@@ -31,15 +43,18 @@ function CheckoutPage() {
       profileFn().then((res) => {
         if (res?.profile) {
           setForm((f) => ({
+            ...f,
             full_name: f.full_name || res.profile!.full_name || "",
             phone: f.phone || res.profile!.phone || "",
             address: f.address || res.profile!.address || "",
-            notes: f.notes,
           }));
         }
       }).catch(() => {});
     }
   }, [user, profileFn]);
+
+  const districts = useMemo(() => districtsOf(form.province), [form.province]);
+  const municipalities = useMemo(() => municipalitiesOf(form.province, form.district), [form.province, form.district]);
 
   if (items.length === 0) {
     return (
@@ -67,11 +82,25 @@ function CheckoutPage() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.province || !form.district || !form.municipality || !form.ward) {
+      toast.error("Please complete province, district, municipality and ward");
+      return;
+    }
     setBusy(true);
+    const fullAddress = [form.tole, form.municipality, `Ward ${form.ward}`, form.district, form.province]
+      .filter(Boolean).join(", ") + (form.address ? ` — ${form.address}` : "");
     try {
       const res = await submit({
         data: {
-          ...form,
+          full_name: form.full_name,
+          phone: form.phone,
+          address: fullAddress,
+          province: form.province,
+          district: form.district,
+          municipality: form.municipality,
+          ward: form.ward,
+          tole: form.tole || null,
+          maps_link: form.maps_link || null,
           notes: form.notes || null,
           promo_code: promoApplied?.code ?? null,
           user_id: user?.id ?? null,
@@ -85,6 +114,8 @@ function CheckoutPage() {
     } finally { setBusy(false); }
   };
 
+  const fieldClass = "mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm";
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:py-10">
       <h1 className="font-display text-2xl text-primary sm:text-3xl">Checkout</h1>
@@ -95,25 +126,73 @@ function CheckoutPage() {
       )}
       <div className="mt-6 grid gap-6 md:grid-cols-[1fr_360px]">
         <form onSubmit={onSubmit} className="space-y-4 rounded-xl border border-border bg-card p-5">
-          <div>
-            <label className="text-sm font-medium">Full Name</label>
-            <input required maxLength={120} value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-              className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="text-sm font-medium">Full Name</label>
+              <input required maxLength={120} value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} className={fieldClass} />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Phone Number</label>
+              <input required maxLength={20} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={fieldClass} placeholder="98XXXXXXXX" />
+            </div>
           </div>
-          <div>
-            <label className="text-sm font-medium">Phone Number</label>
-            <input required maxLength={20} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="98XXXXXXXX" />
+
+          <div className="rounded-lg border border-border p-3">
+            <div className="mb-2 text-sm font-semibold text-primary">Delivery Address (Nepal)</div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground">Province</label>
+                <select required value={form.province}
+                  onChange={(e) => setForm({ ...form, province: e.target.value, district: "", municipality: "" })}
+                  className={fieldClass}>
+                  <option value="">Select Province</option>
+                  {PROVINCES.map((p) => <option key={p} value={p}>{p}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground">District</label>
+                <select required disabled={!form.province} value={form.district}
+                  onChange={(e) => setForm({ ...form, district: e.target.value, municipality: "" })}
+                  className={fieldClass}>
+                  <option value="">Select District</option>
+                  {districts.map((d) => <option key={d} value={d}>{d}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground">Municipality / VDC</label>
+                <select required disabled={!form.district} value={form.municipality}
+                  onChange={(e) => setForm({ ...form, municipality: e.target.value })}
+                  className={fieldClass}>
+                  <option value="">Select Municipality</option>
+                  {municipalities.map((m) => <option key={m} value={m}>{m}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground">Ward No.</label>
+                <input required type="number" min={1} max={35} value={form.ward}
+                  onChange={(e) => setForm({ ...form, ward: e.target.value })} className={fieldClass} placeholder="e.g. 5" />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-medium text-muted-foreground">Tole / Local Area</label>
+                <input maxLength={120} value={form.tole} onChange={(e) => setForm({ ...form, tole: e.target.value })}
+                  className={fieldClass} placeholder="e.g. New Baneshwor, near temple" />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-medium text-muted-foreground">Landmark / Extra details (optional)</label>
+                <textarea maxLength={500} rows={2} value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })}
+                  className={fieldClass} placeholder="Nearest landmark, house no., etc." />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-medium text-muted-foreground">Google Maps Link (optional)</label>
+                <input type="url" maxLength={500} value={form.maps_link} onChange={(e) => setForm({ ...form, maps_link: e.target.value })}
+                  className={fieldClass} placeholder="https://maps.app.goo.gl/..." />
+              </div>
+            </div>
           </div>
-          <div>
-            <label className="text-sm font-medium">Delivery Address</label>
-            <textarea required maxLength={500} rows={3} value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })}
-              className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Street, City, District" />
-          </div>
+
           <div>
             <label className="text-sm font-medium">Notes (optional)</label>
-            <textarea maxLength={500} rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+            <textarea maxLength={500} rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className={fieldClass} />
           </div>
           <div className="rounded-lg border border-accent/40 bg-accent/10 p-3 text-sm">
             <div className="flex items-center gap-2 font-semibold text-accent-foreground"><BadgeCheck className="h-4 w-4" /> Payment: Cash on Delivery (COD)</div>
