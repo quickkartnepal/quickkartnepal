@@ -100,49 +100,67 @@ export type Database = {
           address: string
           created_at: string
           discount: number
+          district: string | null
           full_name: string
           id: string
+          maps_link: string | null
+          municipality: string | null
           notes: string | null
           order_number: string
           payment_method: string
           phone: string
           promo_code: string | null
+          province: string | null
           status: string
           subtotal: number
+          tole: string | null
           updated_at: string
           user_id: string | null
+          ward: string | null
         }
         Insert: {
           address: string
           created_at?: string
           discount?: number
+          district?: string | null
           full_name: string
           id?: string
+          maps_link?: string | null
+          municipality?: string | null
           notes?: string | null
           order_number?: string
           payment_method?: string
           phone: string
           promo_code?: string | null
+          province?: string | null
           status?: string
           subtotal: number
+          tole?: string | null
           updated_at?: string
           user_id?: string | null
+          ward?: string | null
         }
         Update: {
           address?: string
           created_at?: string
           discount?: number
+          district?: string | null
           full_name?: string
           id?: string
+          maps_link?: string | null
+          municipality?: string | null
           notes?: string | null
           order_number?: string
           payment_method?: string
           phone?: string
           promo_code?: string | null
+          province?: string | null
           status?: string
           subtotal?: number
+          tole?: string | null
           updated_at?: string
           user_id?: string | null
+          ward?: string | null
         }
         Relationships: []
       }
