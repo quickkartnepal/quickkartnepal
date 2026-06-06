@@ -73,6 +73,7 @@ function Dashboard() {
       </div>
 
       <div className="mt-6">
+        {tab === "overview" && <StatsOverview />}
         {tab === "products" && <ProductsTab />}
         {tab === "orders" && <OrdersTab />}
         {tab === "banners" && <BannersTab />}
