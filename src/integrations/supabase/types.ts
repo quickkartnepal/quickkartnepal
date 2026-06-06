@@ -14,6 +14,110 @@ export type Database = {
   }
   public: {
     Tables: {
+      affiliate_clicks: {
+        Row: {
+          affiliate_id: string
+          created_at: string
+          id: string
+          ip_hash: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          affiliate_id: string
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          affiliate_id?: string
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_clicks_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: false
+            referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_orders: {
+        Row: {
+          affiliate_id: string
+          commission: number
+          created_at: string
+          id: string
+          order_id: string
+          product_count: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          affiliate_id: string
+          commission?: number
+          created_at?: string
+          id?: string
+          order_id: string
+          product_count?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          affiliate_id?: string
+          commission?: number
+          created_at?: string
+          id?: string
+          order_id?: string
+          product_count?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_orders_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: false
+            referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_orders_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliates: {
+        Row: {
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
       banners: {
         Row: {
           created_at: string
@@ -98,6 +202,7 @@ export type Database = {
       orders: {
         Row: {
           address: string
+          affiliate_code: string | null
           created_at: string
           discount: number
           district: string | null
@@ -120,6 +225,7 @@ export type Database = {
         }
         Insert: {
           address: string
+          affiliate_code?: string | null
           created_at?: string
           discount?: number
           district?: string | null
@@ -142,6 +248,7 @@ export type Database = {
         }
         Update: {
           address?: string
+          affiliate_code?: string | null
           created_at?: string
           discount?: number
           district?: string | null

@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
@@ -102,6 +103,27 @@ export const placeOrder = createServerFn({ method: "POST" })
       }
     }
 
+    // Affiliate attribution via qk_ref cookie
+    let affiliateId: string | null = null;
+    let affiliateCode: string | null = null;
+    try {
+      const req = getRequest();
+      const cookieHeader = req?.headers.get("cookie") ?? "";
+      const match = cookieHeader.match(/(?:^|;\s*)qk_ref=([^;]+)/);
+      if (match) {
+        const ref = decodeURIComponent(match[1]).toLowerCase().slice(0, 40);
+        const { data: aff } = await supabaseAdmin
+          .from("affiliates")
+          .select("id,username")
+          .eq("username", ref)
+          .maybeSingle();
+        if (aff) {
+          affiliateId = aff.id;
+          affiliateCode = aff.username;
+        }
+      }
+    } catch {}
+
     const { data: order, error: oErr } = await supabaseAdmin
       .from("orders")
       .insert({
@@ -121,10 +143,23 @@ export const placeOrder = createServerFn({ method: "POST" })
         payment_method: "COD",
         status: "pending",
         user_id: data.user_id ?? null,
+        affiliate_code: affiliateCode,
       })
       .select("id,order_number")
       .single();
     if (oErr) throw new Error(oErr.message);
+
+    if (affiliateId) {
+      const productCount = data.items.reduce((s, i) => s + i.quantity, 0);
+      await supabaseAdmin.from("affiliate_orders").insert({
+        affiliate_id: affiliateId,
+        order_id: order.id,
+        product_count: productCount,
+        commission: productCount * 70,
+        status: "pending",
+      });
+    }
+
 
     const { error: iErr } = await supabaseAdmin.from("order_items").insert(
       lineItems.map((l) => ({

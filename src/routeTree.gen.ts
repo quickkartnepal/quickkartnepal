@@ -15,10 +15,13 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AffiliateRouteImport } from './routes/affiliate'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RefUsernameRouteImport } from './routes/ref.$username'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
+import { Route as AffiliateDashboardRouteImport } from './routes/affiliate.dashboard'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 
@@ -52,6 +55,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AffiliateRoute = AffiliateRouteImport.update({
+  id: '/affiliate',
+  path: '/affiliate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccountRoute = AccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -67,10 +75,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RefUsernameRoute = RefUsernameRouteImport.update({
+  id: '/ref/$username',
+  path: '/ref/$username',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductsSlugRoute = ProductsSlugRouteImport.update({
   id: '/products/$slug',
   path: '/products/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AffiliateDashboardRoute = AffiliateDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AffiliateRoute,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
@@ -87,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/affiliate': typeof AffiliateRouteWithChildren
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
@@ -95,12 +114,15 @@ export interface FileRoutesByFullPath {
   '/return-policy': typeof ReturnPolicyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
+  '/affiliate/dashboard': typeof AffiliateDashboardRoute
   '/products/$slug': typeof ProductsSlugRoute
+  '/ref/$username': typeof RefUsernameRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/affiliate': typeof AffiliateRouteWithChildren
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
@@ -109,13 +131,16 @@ export interface FileRoutesByTo {
   '/return-policy': typeof ReturnPolicyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
+  '/affiliate/dashboard': typeof AffiliateDashboardRoute
   '/products/$slug': typeof ProductsSlugRoute
+  '/ref/$username': typeof RefUsernameRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/affiliate': typeof AffiliateRouteWithChildren
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
@@ -124,7 +149,9 @@ export interface FileRoutesById {
   '/return-policy': typeof ReturnPolicyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
+  '/affiliate/dashboard': typeof AffiliateDashboardRoute
   '/products/$slug': typeof ProductsSlugRoute
+  '/ref/$username': typeof RefUsernameRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -132,6 +159,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
+    | '/affiliate'
     | '/auth'
     | '/cart'
     | '/checkout'
@@ -140,12 +168,15 @@ export interface FileRouteTypes {
     | '/return-policy'
     | '/admin/dashboard'
     | '/admin/login'
+    | '/affiliate/dashboard'
     | '/products/$slug'
+    | '/ref/$username'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/account'
+    | '/affiliate'
     | '/auth'
     | '/cart'
     | '/checkout'
@@ -154,12 +185,15 @@ export interface FileRouteTypes {
     | '/return-policy'
     | '/admin/dashboard'
     | '/admin/login'
+    | '/affiliate/dashboard'
     | '/products/$slug'
+    | '/ref/$username'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/account'
+    | '/affiliate'
     | '/auth'
     | '/cart'
     | '/checkout'
@@ -168,13 +202,16 @@ export interface FileRouteTypes {
     | '/return-policy'
     | '/admin/dashboard'
     | '/admin/login'
+    | '/affiliate/dashboard'
     | '/products/$slug'
+    | '/ref/$username'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRoute
+  AffiliateRoute: typeof AffiliateRouteWithChildren
   AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
@@ -184,6 +221,7 @@ export interface RootRouteChildren {
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminLoginRoute: typeof AdminLoginRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
+  RefUsernameRoute: typeof RefUsernameRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -230,6 +268,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/affiliate': {
+      id: '/affiliate'
+      path: '/affiliate'
+      fullPath: '/affiliate'
+      preLoaderRoute: typeof AffiliateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/account': {
       id: '/account'
       path: '/account'
@@ -251,12 +296,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ref/$username': {
+      id: '/ref/$username'
+      path: '/ref/$username'
+      fullPath: '/ref/$username'
+      preLoaderRoute: typeof RefUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/products/$slug': {
       id: '/products/$slug'
       path: '/products/$slug'
       fullPath: '/products/$slug'
       preLoaderRoute: typeof ProductsSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/affiliate/dashboard': {
+      id: '/affiliate/dashboard'
+      path: '/dashboard'
+      fullPath: '/affiliate/dashboard'
+      preLoaderRoute: typeof AffiliateDashboardRouteImport
+      parentRoute: typeof AffiliateRoute
     }
     '/admin/login': {
       id: '/admin/login'
@@ -275,10 +334,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AffiliateRouteChildren {
+  AffiliateDashboardRoute: typeof AffiliateDashboardRoute
+}
+
+const AffiliateRouteChildren: AffiliateRouteChildren = {
+  AffiliateDashboardRoute: AffiliateDashboardRoute,
+}
+
+const AffiliateRouteWithChildren = AffiliateRoute._addFileChildren(
+  AffiliateRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AccountRoute: AccountRoute,
+  AffiliateRoute: AffiliateRouteWithChildren,
   AuthRoute: AuthRoute,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
@@ -288,17 +360,8 @@ const rootRouteChildren: RootRouteChildren = {
   AdminDashboardRoute: AdminDashboardRoute,
   AdminLoginRoute: AdminLoginRoute,
   ProductsSlugRoute: ProductsSlugRoute,
+  RefUsernameRoute: RefUsernameRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -1,48 +1,53 @@
-This is a large scope. I'll split it into phases so you can approve and so each piece is tested before stacking the next. Confirm the phases (or reorder) and I'll start with Phase 1.
+# Admin Dashboard Stats + Affiliate Partner System
 
-## Phase 1 — Customer accounts & order history
-- Enable email/password signup + login (phone & name captured at signup, stored in `profiles` table).
-- New routes: `/auth` (login + signup tabs), `/account` (profile, saved address), `/account/orders` (order history + status tracking).
-- Link `orders.user_id` (nullable) so guest COD still works but logged-in users see their history.
-- Header: show "Login" or account menu (My Orders, Logout).
-- Checkout auto-fills name/phone/address from profile when logged in.
+Two additions to Quick Kart Nepal. No design/layout changes to existing pages — new sections only.
 
-## Phase 2 — Admin product upgrades
-- Remove slug field from admin form; auto-generate from name.
-- Remove manual rating input (rating becomes derived avg of approved reviews; products.rating becomes computed/updated via trigger).
-- Replace URL inputs with direct file uploads:
-  - Create Storage buckets `product-images` (public) and `product-videos` (public).
-  - Admin form: drag-and-drop / file picker, uploads via signed admin client, stores public URLs in `products.images[]` / `products.video_url`.
-- Admin password change UI (calls `supabase.auth.updateUser({ password })`).
+## 1. Admin Main Dashboard (Stats Panel)
 
-## Phase 3 — Banners & Promo codes
-- New `banners` table (image_url, link, sort_order, is_active). Admin CRUD + upload. Homepage slider reads from DB.
-- New `promo_codes` table (code, type: percent|fixed, value, min_subtotal, expires_at, is_active, usage_limit, used_count).
-- Checkout: "Apply promo code" field → server-validates and applies discount to subtotal. Store `promo_code` + `discount` on orders.
+Add a new "Overview" tab at the top of `src/routes/admin.dashboard.tsx` (default tab). Keeps existing Products/Orders/Banners/Promos tabs untouched.
 
-## Phase 4 — Reviews & ratings
-- Reviews require the reviewer to have a delivered order containing that product (when logged in). Guests can still leave reviews but flagged as unverified.
-- Trigger to recompute `products.rating` on review insert/delete.
+**Stats cards (top row):**
+- Total Orders, Total Sales (sum of delivered order subtotals), Total Revenue (all orders), Total Products, Total Customers (profiles count)
 
-## Phase 5 — Content & contact
-- Rewrite About page (mission, vision, founders Suraj & Romeo, developer credit Suraj Bishwokarma, story).
-- Rewrite Return & Refund policy (clear days, conditions, COD refund process, replacement).
-- Contact page: verify all links use `https://wa.me/...`, `https://instagram.com/...`, `https://www.tiktok.com/@...`, `mailto:` with `target="_blank" rel="noopener"`. (Already mostly correct — audit + fix.)
-- Checkout: keep COD compulsory, ensure delivery-charge notice is prominent.
+**Charts** (using `recharts`, already shadcn-compatible):
+- Daily sales — last 30 days (line/area chart)
+- Monthly sales — last 12 months (bar chart)
+- Order trends — orders/day count (line)
 
-## Phase 6 — Mobile polish & fixes
-- Audit Header (mobile menu), ProductCard grid, Checkout, Admin tables (horizontal scroll on small screens), tap target sizes.
-- Fix the current hydration warning in Footer (email line has stray whitespace mismatch between SSR and client).
+**Lists:**
+- Recent orders (latest 10)
+- Top-selling products (aggregated from order_items)
 
-## Technical notes
-- Storage uploads use `supabaseAdmin` inside a `createServerFn` that accepts base64 or uses a signed upload URL flow (signed URL preferred to keep payload small).
-- Auth uses Supabase email/password; `auto_confirm_email: true` so users can log in immediately without email setup. Google OAuth not added unless you ask.
-- New tables get RLS + GRANTs per the project rules.
-- Rating trigger uses SECURITY DEFINER to update `products.rating`.
+Single server fn `getAdminStats` in `src/lib/admin.functions.ts` returns all the data in one call (admin-guarded via existing admin email check).
 
-## Questions before I start
-1. OK to skip email confirmation (users can log in immediately after signup)? Recommended for COD store.
-2. For promo codes: per-user usage limit, or just global usage limit? I'll default to **global** unless you say otherwise.
-3. Banner link target: internal product page or arbitrary URL? I'll allow both.
+## 2. Affiliate Partner System
 
-Reply "go" to start Phase 1, or tell me to reorder / drop phases.
+### Database (one migration)
+- `affiliates` — user_id (FK auth.users), username (unique slug), created_at
+- `affiliate_clicks` — affiliate_id, ip_hash, created_at
+- `affiliate_orders` — affiliate_id, order_id (FK orders), product_count, commission (Rs. 70 × products), status (pending/paid)
+- Add column `orders.affiliate_code text` to attribute orders
+- RLS: affiliates can read their own rows; service_role manages writes; GRANTs included
+
+### Routes
+- `/affiliate` — public landing + login/signup (long professional copy about affiliate marketing, benefits, "Rs. 70 per product")
+- `/affiliate/dashboard` — protected; shows unique link `quickkartnepal.com/ref=username`, total clicks, total orders, total earnings (paid+pending), per-order breakdown, password change
+- `/ref/$username` — server route: records click, sets `qk_ref` cookie (30 days), redirects to `/`
+
+### Header/Footer link
+Add "Affiliate Partner" link in the Footer info section near Return Policy (and in mobile menu). No styling changes — reuse existing link classes.
+
+### Checkout integration
+`placeOrder` reads `qk_ref` cookie; if present and matches an affiliate, stores `affiliate_code` on the order and inserts `affiliate_orders` row with commission = items_count × 70.
+
+### Server functions (`src/lib/affiliate.functions.ts`)
+- `signupAffiliate({ username })` — creates affiliate row for current auth user (uses `requireSupabaseAuth`)
+- `getMyAffiliate()` — profile + stats (clicks/orders/earnings) + recent referred orders
+- Password change reuses existing `supabase.auth.updateUser`
+
+## Files
+**New:** migration, `src/lib/affiliate.functions.ts`, `src/routes/affiliate.tsx`, `src/routes/affiliate.dashboard.tsx`, `src/routes/ref.$username.tsx`, `src/components/admin/StatsOverview.tsx`
+
+**Edited:** `src/lib/admin.functions.ts` (add getAdminStats), `src/lib/shop.functions.ts` (read ref cookie, record affiliate order), `src/routes/admin.dashboard.tsx` (add Overview tab), `src/components/site/Footer.tsx` (add link near Return Policy), `src/components/site/Header.tsx` (mobile menu link)
+
+No changes to existing visual design, colors, or layouts.

@@ -17,18 +17,19 @@ import {
   upsertPromo,
 } from "@/lib/admin.functions";
 import { toast } from "sonner";
-import { LogOut, Package, ShoppingBag, Plus, Pencil, Trash2, Image as ImageIcon, Tag, KeyRound, Upload, X } from "lucide-react";
+import { LogOut, Package, ShoppingBag, Plus, Pencil, Trash2, Image as ImageIcon, Tag, KeyRound, Upload, X, LayoutDashboard } from "lucide-react";
+import { StatsOverview } from "@/components/admin/StatsOverview";
 
 export const Route = createFileRoute("/admin/dashboard")({
   head: () => ({ meta: [{ title: "Admin Dashboard — Quick Kart Nepal" }, { name: "robots", content: "noindex" }] }),
   component: Dashboard,
 });
 
-type Tab = "products" | "orders" | "banners" | "promos" | "settings";
+type Tab = "overview" | "products" | "orders" | "banners" | "promos" | "settings";
 
 function Dashboard() {
   const nav = useNavigate();
-  const [tab, setTab] = useState<Tab>("products");
+  const [tab, setTab] = useState<Tab>("overview");
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,6 +45,7 @@ function Dashboard() {
   };
 
   const tabs: { id: Tab; label: string; icon: any }[] = [
+    { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "products", label: "Products", icon: Package },
     { id: "orders", label: "Orders", icon: ShoppingBag },
     { id: "banners", label: "Banners", icon: ImageIcon },
@@ -73,6 +75,7 @@ function Dashboard() {
       </div>
 
       <div className="mt-6">
+        {tab === "overview" && <StatsOverview />}
         {tab === "products" && <ProductsTab />}
         {tab === "orders" && <OrdersTab />}
         {tab === "banners" && <BannersTab />}

@@ -10,6 +10,7 @@ const nav = [
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
   { to: "/return-policy", label: "Returns" },
+  { to: "/affiliate", label: "Affiliate" },
 ];
 
 export function Header() {

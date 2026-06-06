@@ -3,6 +3,108 @@ import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+// --- Admin dashboard stats ---------------------------------------
+export const getAdminStats = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+
+    const [
+      { count: ordersCount },
+      { count: productsCount },
+      { count: customersCount },
+      { data: allOrders },
+      { data: recentOrders },
+      { data: items },
+    ] = await Promise.all([
+      supabaseAdmin.from("orders").select("id", { count: "exact", head: true }),
+      supabaseAdmin.from("products").select("id", { count: "exact", head: true }),
+      supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }),
+      supabaseAdmin.from("orders").select("id,subtotal,status,created_at"),
+      supabaseAdmin
+        .from("orders")
+        .select("id,order_number,full_name,subtotal,status,created_at")
+        .order("created_at", { ascending: false })
+        .limit(10),
+      supabaseAdmin
+        .from("order_items")
+        .select("product_id,product_name,product_image,quantity,unit_price"),
+    ]);
+
+    const totalSales = (allOrders ?? [])
+      .filter((o) => o.status === "delivered")
+      .reduce((s, o) => s + Number(o.subtotal ?? 0), 0);
+    const totalRevenue = (allOrders ?? []).reduce((s, o) => s + Number(o.subtotal ?? 0), 0);
+
+    // Daily last 30 days
+    const days: { date: string; sales: number; orders: number }[] = [];
+    const now = new Date();
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      days.push({ date: key.slice(5), sales: 0, orders: 0 });
+    }
+    const dayIdx = new Map(days.map((d, i) => [d.date, i]));
+    (allOrders ?? []).forEach((o) => {
+      const k = new Date(o.created_at).toISOString().slice(5, 10);
+      const i = dayIdx.get(k);
+      if (i != null) {
+        days[i].sales += Number(o.subtotal ?? 0);
+        days[i].orders += 1;
+      }
+    });
+
+    // Monthly last 12 months
+    const months: { month: string; sales: number; orders: number }[] = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = d.toLocaleString("en-US", { month: "short", year: "2-digit" });
+      months.push({ month: key, sales: 0, orders: 0 });
+    }
+    const monthIdx = new Map(months.map((m, i) => [m.month, i]));
+    (allOrders ?? []).forEach((o) => {
+      const d = new Date(o.created_at);
+      const k = d.toLocaleString("en-US", { month: "short", year: "2-digit" });
+      const i = monthIdx.get(k);
+      if (i != null) {
+        months[i].sales += Number(o.subtotal ?? 0);
+        months[i].orders += 1;
+      }
+    });
+
+    // Top products
+    const agg = new Map<string, { product_id: string; product_name: string; product_image: string | null; units: number; revenue: number }>();
+    (items ?? []).forEach((it) => {
+      if (!it.product_id) return;
+      const cur = agg.get(it.product_id) ?? {
+        product_id: it.product_id,
+        product_name: it.product_name,
+        product_image: it.product_image,
+        units: 0,
+        revenue: 0,
+      };
+      cur.units += Number(it.quantity ?? 0);
+      cur.revenue += Number(it.unit_price ?? 0) * Number(it.quantity ?? 0);
+      agg.set(it.product_id, cur);
+    });
+    const topProducts = Array.from(agg.values()).sort((a, b) => b.units - a.units).slice(0, 8);
+
+    return {
+      totals: {
+        orders: ordersCount ?? 0,
+        sales: totalSales,
+        revenue: totalRevenue,
+        products: productsCount ?? 0,
+        customers: customersCount ?? 0,
+      },
+      daily: days,
+      monthly: months,
+      recentOrders: recentOrders ?? [],
+      topProducts,
+    };
+  });
+
 const ADMIN_EMAIL = "infoquickkartnepal@gmail.com";
 const ADMIN_PASSWORD = "Rgsbqkno$777";
 
