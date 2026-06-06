@@ -76,6 +76,7 @@ export const getAdminStats = createServerFn({ method: "GET" })
     // Top products
     const agg = new Map<string, { product_id: string; product_name: string; product_image: string | null; units: number; revenue: number }>();
     (items ?? []).forEach((it) => {
+      if (!it.product_id) return;
       const cur = agg.get(it.product_id) ?? {
         product_id: it.product_id,
         product_name: it.product_name,
