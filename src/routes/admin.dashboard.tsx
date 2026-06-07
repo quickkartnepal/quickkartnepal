@@ -17,8 +17,11 @@ import {
   upsertPromo,
 } from "@/lib/admin.functions";
 import { toast } from "sonner";
-import { LogOut, Package, ShoppingBag, Plus, Pencil, Trash2, Image as ImageIcon, Tag, KeyRound, Upload, X, LayoutDashboard } from "lucide-react";
+import { LogOut, Package, ShoppingBag, Plus, Pencil, Trash2, Image as ImageIcon, Tag, KeyRound, Upload, X, LayoutDashboard, Users, Wallet } from "lucide-react";
 import { StatsOverview } from "@/components/admin/StatsOverview";
+import { listAffiliatesAdmin, listPaymentRequestsAdmin, updatePaymentRequestAdmin } from "@/lib/affiliate.functions";
+
+type Tab = "overview" | "products" | "orders" | "banners" | "promos" | "affiliates" | "payouts" | "settings";
 
 export const Route = createFileRoute("/admin/dashboard")({
   head: () => ({ meta: [{ title: "Admin Dashboard — Quick Kart Nepal" }, { name: "robots", content: "noindex" }] }),
