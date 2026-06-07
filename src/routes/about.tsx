@@ -13,6 +13,9 @@ export const Route = createFileRoute("/about")({
 function About() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
+      <div className="mb-6 rounded-lg bg-secondary/50 px-4 py-2 text-center text-xs font-medium text-muted-foreground">
+        Website Developed by Suraj Bishwokarma
+      </div>
       <h1 className="font-display text-4xl text-primary">About Quick Kart Nepal</h1>
       <p className="mt-3 text-sm uppercase tracking-widest text-accent">Founded by Suraj &amp; Romeo</p>
 

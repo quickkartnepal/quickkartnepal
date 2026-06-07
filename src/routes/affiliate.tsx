@@ -32,14 +32,22 @@ function AffiliatePage() {
   const signupFn = useServerFn(signupAffiliate);
   const [tab, setTab] = useState<"login" | "signup">("login");
   const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState({ full_name: "", phone: "", email: "", password: "", username: "" });
+  const [form, setForm] = useState({ full_name: "", phone: "", email: "", password: "" });
 
   useEffect(() => {
     if (!loading && user) {
-      // Check if already an affiliate, then jump to dashboard
       nav({ to: "/affiliate/dashboard" });
     }
   }, [loading, user, nav]);
+
+  const ensureAffiliateThenGo = async () => {
+    try {
+      await signupFn();
+    } catch {
+      // ignore — dashboard will auto-create
+    }
+    nav({ to: "/affiliate/dashboard" });
+  };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,25 +55,30 @@ function AffiliatePage() {
     try {
       if (tab === "signup") {
         if (!form.email) throw new Error("Email is required");
-        if (!/^[a-z0-9_]{3,30}$/i.test(form.username)) throw new Error("Username: 3–30 letters/numbers/underscore");
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error } = await supabase.auth.signUp({
           email: form.email,
           password: form.password,
           options: {
-            emailRedirectTo: window.location.origin,
+            emailRedirectTo: window.location.origin + "/affiliate/dashboard",
             data: { full_name: form.full_name, phone: form.phone },
           },
         });
         if (error) throw error;
-        // Wait briefly for session, then claim username
-        await new Promise((r) => setTimeout(r, 400));
-        try {
-          await signupFn({ data: { username: form.username } });
-        } catch (err: any) {
-          toast.error(err?.message ?? "Affiliate username could not be claimed — try again in the dashboard");
+
+        // If no session was returned (email confirm), try password sign-in
+        if (!signUpData.session) {
+          const { error: signInErr } = await supabase.auth.signInWithPassword({
+            email: form.email,
+            password: form.password,
+          });
+          if (signInErr) {
+            toast.success("Account created! Please check your email to confirm, then sign in.");
+            setTab("login");
+            return;
+          }
         }
         toast.success("Affiliate account created!");
-        nav({ to: "/affiliate/dashboard" });
+        await ensureAffiliateThenGo();
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: form.email,
@@ -73,7 +86,7 @@ function AffiliatePage() {
         });
         if (error) throw error;
         toast.success("Welcome back");
-        nav({ to: "/affiliate/dashboard" });
+        await ensureAffiliateThenGo();
       }
     } catch (e: any) {
       toast.error(e?.message ?? "Failed");
@@ -84,6 +97,10 @@ function AffiliatePage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
+      <div className="mb-6 rounded-lg bg-secondary/50 px-4 py-2 text-center text-xs font-medium text-muted-foreground">
+        Website Developed by Suraj Bishwokarma
+      </div>
+
       <div className="grid gap-8 lg:grid-cols-2">
         {/* Marketing copy */}
         <div>
@@ -107,7 +124,7 @@ function AffiliatePage() {
               no orders to ship, no customer support — we handle everything.
             </p>
             <ol className="mt-2 space-y-2 text-sm">
-              <li className="flex gap-2"><span className="font-bold text-primary">1.</span> Sign up — get your unique link instantly: <span className="font-mono text-xs">quickkartnepal.com/ref/your-name</span></li>
+              <li className="flex gap-2"><span className="font-bold text-primary">1.</span> Sign up — we instantly create your unique affiliate link</li>
               <li className="flex gap-2"><span className="font-bold text-primary">2.</span> Share — on TikTok, Instagram, WhatsApp, Facebook, or anywhere your audience hangs out</li>
               <li className="flex gap-2"><span className="font-bold text-primary">3.</span> Earn — Rs. 70 added to your account for every product sold via your link</li>
             </ol>
@@ -145,14 +162,6 @@ function AffiliatePage() {
                     placeholder="Full name" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
                   <input required maxLength={20} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
                     placeholder="Phone number" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
-                  <div>
-                    <div className="flex items-center rounded-md border border-input bg-background px-3 py-2 text-sm">
-                      <span className="mr-1 text-muted-foreground">quickkartnepal.com/ref/</span>
-                      <input required maxLength={30} value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value.replace(/[^a-z0-9_]/gi, "") })}
-                        placeholder="yourname" className="flex-1 bg-transparent outline-none" />
-                    </div>
-                    <p className="mt-1 text-xs text-muted-foreground">Your unique affiliate link.</p>
-                  </div>
                 </>
               )}
               <input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -163,7 +172,10 @@ function AffiliatePage() {
                 {busy ? "Please wait…" : tab === "signup" ? "Create affiliate account" : "Sign in"}
               </button>
             </form>
-            <p className="mt-4 text-center text-xs text-muted-foreground">
+            <p className="mt-3 text-center text-xs text-muted-foreground">
+              Your unique affiliate link is generated automatically after signup.
+            </p>
+            <p className="mt-2 text-center text-xs text-muted-foreground">
               Already shopping with us? <Link to="/auth" className="text-primary">Customer login</Link>
             </p>
           </div>
