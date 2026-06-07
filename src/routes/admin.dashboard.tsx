@@ -28,7 +28,7 @@ export const Route = createFileRoute("/admin/dashboard")({
   component: Dashboard,
 });
 
-type Tab = "overview" | "products" | "orders" | "banners" | "promos" | "settings";
+
 
 function Dashboard() {
   const nav = useNavigate();
@@ -53,6 +53,8 @@ function Dashboard() {
     { id: "orders", label: "Orders", icon: ShoppingBag },
     { id: "banners", label: "Banners", icon: ImageIcon },
     { id: "promos", label: "Promo Codes", icon: Tag },
+    { id: "affiliates", label: "Affiliates", icon: Users },
+    { id: "payouts", label: "Payouts", icon: Wallet },
     { id: "settings", label: "Settings", icon: KeyRound },
   ];
 
@@ -83,6 +85,8 @@ function Dashboard() {
         {tab === "orders" && <OrdersTab />}
         {tab === "banners" && <BannersTab />}
         {tab === "promos" && <PromosTab />}
+        {tab === "affiliates" && <AffiliatesTab />}
+        {tab === "payouts" && <PayoutsTab />}
         {tab === "settings" && <SettingsTab />}
       </div>
     </div>
