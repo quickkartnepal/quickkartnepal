@@ -602,3 +602,96 @@ function SettingsTab() {
     </form>
   );
 }
+
+// ---------------- Affiliates ----------------
+function AffiliatesTab() {
+  const fetchFn = useServerFn(listAffiliatesAdmin);
+  const { data, isLoading } = useQuery({ queryKey: ["admin-affiliates"], queryFn: () => fetchFn() });
+  if (isLoading || !data) return <div className="text-sm text-muted-foreground">Loading…</div>;
+  if (data.affiliates.length === 0)
+    return <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">No affiliates yet.</div>;
+  return (
+    <div className="overflow-x-auto rounded-xl border border-border bg-card">
+      <table className="w-full text-sm">
+        <thead className="bg-secondary/60 text-left text-xs uppercase tracking-wider text-muted-foreground">
+          <tr>
+            <th className="p-3">Affiliate</th>
+            <th className="p-3">Joined</th>
+            <th className="p-3">Clicks</th>
+            <th className="p-3">Orders</th>
+            <th className="p-3">Products</th>
+            <th className="p-3">Earnings</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.affiliates.map((a: any) => (
+            <tr key={a.id} className="border-t border-border align-top">
+              <td className="p-3">
+                <div className="font-medium">{a.full_name ?? "—"}</div>
+                <div className="text-xs text-muted-foreground">@{a.username}</div>
+                {a.phone && <div className="text-xs text-muted-foreground">{a.phone}</div>}
+              </td>
+              <td className="p-3 text-xs text-muted-foreground">{new Date(a.created_at).toLocaleDateString()}</td>
+              <td className="p-3">{a.clicks}</td>
+              <td className="p-3">{a.total_orders}</td>
+              <td className="p-3">{a.total_products}</td>
+              <td className="p-3 font-semibold">Rs. {Number(a.total_earnings).toLocaleString()}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ---------------- Payouts ----------------
+function PayoutsTab() {
+  const qc = useQueryClient();
+  const fetchFn = useServerFn(listPaymentRequestsAdmin);
+  const updateFn = useServerFn(updatePaymentRequestAdmin);
+  const { data, isLoading } = useQuery({ queryKey: ["admin-payouts"], queryFn: () => fetchFn() });
+
+  const act = async (id: string, status: "approved" | "rejected") => {
+    try {
+      await updateFn({ data: { id, status } });
+      toast.success(`Request ${status}`);
+      qc.invalidateQueries({ queryKey: ["admin-payouts"] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
+  };
+
+  if (isLoading || !data) return <div className="text-sm text-muted-foreground">Loading…</div>;
+  if (data.requests.length === 0)
+    return <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">No payment requests.</div>;
+
+  return (
+    <div className="space-y-3">
+      {data.requests.map((r: any) => (
+        <div key={r.id} className="rounded-xl border border-border bg-card p-4">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <div className="font-semibold">{r.full_name} <span className="text-xs text-muted-foreground">@{r.affiliate?.username ?? "—"}</span></div>
+              <div className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleString()}</div>
+              <div className="mt-1 text-lg font-semibold text-primary">Rs. {Number(r.amount).toLocaleString()}</div>
+              <div className="text-xs capitalize text-muted-foreground">Status: {r.status}</div>
+            </div>
+            {r.qr_url && (
+              <a href={r.qr_url} target="_blank" rel="noreferrer" className="block">
+                <img src={r.qr_url} alt="QR" className="h-32 w-32 rounded-md border border-border object-cover" />
+              </a>
+            )}
+          </div>
+          {r.status === "pending" && (
+            <div className="mt-3 flex gap-2">
+              <button onClick={() => act(r.id, "approved")}
+                className="rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90">Approve</button>
+              <button onClick={() => act(r.id, "rejected")}
+                className="rounded-full border border-destructive px-4 py-2 text-xs font-semibold text-destructive hover:bg-destructive hover:text-destructive-foreground">Reject</button>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
