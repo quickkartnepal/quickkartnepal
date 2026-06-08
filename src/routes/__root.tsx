@@ -11,6 +11,7 @@ import appCss from "../styles.css?url";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartProvider } from "@/lib/cart";
+import { AuthProvider } from "@/lib/auth";
 import { Toaster } from "sonner";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
@@ -66,16 +67,18 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <div className="flex min-h-screen flex-col bg-paper">
-          <Header />
-          <main className="flex-1">
-            <Outlet />
-          </main>
-          <Footer />
-          <Toaster richColors position="top-center" />
-        </div>
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <div className="flex min-h-screen flex-col bg-paper">
+            <Header />
+            <main className="flex-1">
+              <Outlet />
+            </main>
+            <Footer />
+            <Toaster richColors position="top-center" />
+          </div>
+        </CartProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

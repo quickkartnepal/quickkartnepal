@@ -35,11 +35,6 @@ export function Footer() {
           <div className="mb-3 text-sm font-semibold">Get in touch</div>
           <ul className="space-y-2 text-sm">
             <li>
-              <a href="https://wa.me/9779807470285" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-primary">
-                <MessageCircle className="h-4 w-4" /> <span>WhatsApp: 9807470285</span>
-              </a>
-            </li>
-            <li>
               <a href="https://wa.me/9779802649094" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-primary">
                 <MessageCircle className="h-4 w-4" /> <span>WhatsApp: 9802649094</span>
               </a>
