@@ -12,7 +12,6 @@ export const Route = createFileRoute("/contact")({
 });
 
 const items = [
-  { icon: MessageCircle, label: "WhatsApp", value: "9807470285", href: "https://wa.me/9779807470285" },
   { icon: MessageCircle, label: "WhatsApp", value: "9802649094", href: "https://wa.me/9779802649094" },
   { icon: Mail, label: "Email", value: "infoquickkartnepal@gmail.com", href: "mailto:infoquickkartnepal@gmail.com" },
   { icon: Instagram, label: "Instagram", value: "@quickkart_nepal", href: "https://instagram.com/quickkart_nepal" },

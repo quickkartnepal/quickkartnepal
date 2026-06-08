@@ -58,13 +58,13 @@ function Policy() {
 
         <h2 className="font-display text-xl text-primary">How to request a return</h2>
         <ol className="list-decimal space-y-1 pl-5">
-          <li>WhatsApp us at <strong>9807470285</strong> or <strong>9802649094</strong> with your order number and photos of the issue.</li>
+          <li>WhatsApp us at <strong>9802649094</strong> with your order number and photos of the issue.</li>
           <li>We&apos;ll confirm eligibility and arrange pickup or return shipping.</li>
           <li>Once received and verified, your refund or replacement is processed within 5–7 business days.</li>
         </ol>
 
         <p className="mt-6 rounded-xl border border-accent/30 bg-accent/10 p-4 text-sm">
-          Need help with an order? Contact us anytime on WhatsApp <strong>9807470285</strong> / <strong>9802649094</strong> or email <a className="text-primary underline" href="mailto:infoquickkartnepal@gmail.com">infoquickkartnepal@gmail.com</a>.
+          Need help with an order? Contact us anytime on WhatsApp <strong>9802649094</strong> or email <a className="text-primary underline" href="mailto:infoquickkartnepal@gmail.com">infoquickkartnepal@gmail.com</a>.
         </p>
       </div>
     </div>
