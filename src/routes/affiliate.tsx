@@ -1,5 +1,9 @@
 import { Outlet, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/affiliate")({
-  component: () => <Outlet />,
+  component: AffiliateLayout,
 });
+
+function AffiliateLayout() {
+  return <Outlet />;
+}
