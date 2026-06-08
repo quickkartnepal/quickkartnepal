@@ -15,6 +15,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AffiliateRouteImport } from './routes/affiliate'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -55,6 +56,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AffiliateRoute = AffiliateRouteImport.update({
+  id: '/affiliate',
+  path: '/affiliate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccountRoute = AccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -71,9 +77,9 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AffiliateIndexRoute = AffiliateIndexRouteImport.update({
-  id: '/affiliate/',
-  path: '/affiliate/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AffiliateRoute,
 } as any)
 const RefUsernameRoute = RefUsernameRouteImport.update({
   id: '/ref/$username',
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/affiliate': typeof AffiliateRouteWithChildren
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
@@ -140,6 +147,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/affiliate': typeof AffiliateRouteWithChildren
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
@@ -159,6 +167,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
+    | '/affiliate'
     | '/auth'
     | '/cart'
     | '/checkout'
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
+    | '/affiliate'
     | '/auth'
     | '/cart'
     | '/checkout'
@@ -211,6 +221,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRoute
+  AffiliateRoute: typeof AffiliateRouteWithChildren
   AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
@@ -221,7 +232,6 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
   RefUsernameRoute: typeof RefUsernameRoute
-  AffiliateIndexRoute: typeof AffiliateIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -268,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/affiliate': {
+      id: '/affiliate'
+      path: '/affiliate'
+      fullPath: '/affiliate'
+      preLoaderRoute: typeof AffiliateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/account': {
       id: '/account'
       path: '/account'
@@ -291,10 +308,10 @@ declare module '@tanstack/react-router' {
     }
     '/affiliate/': {
       id: '/affiliate/'
-      path: '/affiliate'
+      path: '/'
       fullPath: '/affiliate/'
       preLoaderRoute: typeof AffiliateIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AffiliateRoute
     }
     '/ref/$username': {
       id: '/ref/$username'
@@ -334,10 +351,25 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AffiliateRouteChildren {
+  AffiliateDashboardRoute: typeof AffiliateDashboardRoute
+  AffiliateIndexRoute: typeof AffiliateIndexRoute
+}
+
+const AffiliateRouteChildren: AffiliateRouteChildren = {
+  AffiliateDashboardRoute: AffiliateDashboardRoute,
+  AffiliateIndexRoute: AffiliateIndexRoute,
+}
+
+const AffiliateRouteWithChildren = AffiliateRoute._addFileChildren(
+  AffiliateRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AccountRoute: AccountRoute,
+  AffiliateRoute: AffiliateRouteWithChildren,
   AuthRoute: AuthRoute,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
@@ -348,7 +380,6 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   ProductsSlugRoute: ProductsSlugRoute,
   RefUsernameRoute: RefUsernameRoute,
-  AffiliateIndexRoute: AffiliateIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
