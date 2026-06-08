@@ -7,7 +7,7 @@ import { signupAffiliate } from "@/lib/affiliate.functions";
 import { toast } from "sonner";
 import { CheckCircle2, Globe, Wallet, Sparkles } from "lucide-react";
 
-export const Route = createFileRoute("/affiliate")({
+export const Route = createFileRoute("/affiliate/")({
   head: () => ({
     meta: [
       { title: "Affiliate Partner Program — Quick Kart Nepal" },
