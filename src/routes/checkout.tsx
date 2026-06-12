@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { placeOrder, validatePromo } from "@/lib/shop.functions";
 import { getMyProfile } from "@/lib/user.functions";
 import { useAuth } from "@/lib/auth";
+import { getDeliveryCharge, STANDARD_DELIVERY } from "@/lib/delivery";
 import { toast } from "sonner";
 import { BadgeCheck, Truck, Tag } from "lucide-react";
 import { PROVINCES, districtsOf, municipalitiesOf } from "@/lib/nepal-address";
@@ -79,6 +80,8 @@ function CheckoutPage() {
   };
 
   const total = Math.max(0, subtotal - (promoApplied?.discount ?? 0));
+  const { charge: deliveryCharge, discount: deliveryDiscount, discountPercent } = getDeliveryCharge(subtotal);
+  const grandTotal = total + deliveryCharge;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -233,12 +236,21 @@ function CheckoutPage() {
               <span>Discount</span><span>- Rs. {promoApplied.discount.toLocaleString()}</span>
             </div>
           )}
-          <div className="mt-1 flex justify-between font-semibold">
-            <span>Total</span><span>Rs. {total.toLocaleString()}</span>
+          <div className="flex justify-between text-sm">
+            <span>Delivery</span>
+            <span>{deliveryCharge === 0 ? "Free" : `Rs. ${deliveryCharge.toLocaleString()}`}</span>
           </div>
-          <div className="mt-3 flex items-start gap-2 text-xs text-muted-foreground">
-            <Truck className="mt-0.5 h-3.5 w-3.5" />
-            Delivery charge will be determined after order completion based on location.
+          {deliveryDiscount > 0 && (
+            <div className="flex justify-between text-xs text-green-600">
+              <span>Delivery discount ({discountPercent}%)</span>
+              <span>- Rs. {deliveryDiscount.toLocaleString()}</span>
+            </div>
+          )}
+          <div className="mt-1 flex justify-between font-semibold">
+            <span>Grand Total</span><span>Rs. {grandTotal.toLocaleString()}</span>
+          </div>
+          <div className="mt-3 rounded-lg border border-border bg-secondary/40 p-2 text-xs text-muted-foreground">
+            <strong>Delivery info:</strong> Standard delivery Rs. {STANDARD_DELIVERY}. Orders Rs. 1,500–2,500 get 30% off, Rs. 2,500–3,000 get 50% off, Rs. 3,000+ get free delivery.
           </div>
         </aside>
       </div>
