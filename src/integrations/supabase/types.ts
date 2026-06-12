@@ -248,6 +248,8 @@ export type Database = {
           address: string
           affiliate_code: string | null
           created_at: string
+          delivery_charge: number
+          delivery_discount: number
           discount: number
           district: string | null
           full_name: string
@@ -271,6 +273,8 @@ export type Database = {
           address: string
           affiliate_code?: string | null
           created_at?: string
+          delivery_charge?: number
+          delivery_discount?: number
           discount?: number
           district?: string | null
           full_name: string
@@ -294,6 +298,8 @@ export type Database = {
           address?: string
           affiliate_code?: string | null
           created_at?: string
+          delivery_charge?: number
+          delivery_discount?: number
           discount?: number
           district?: string | null
           full_name?: string

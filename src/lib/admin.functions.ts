@@ -20,10 +20,10 @@ export const getAdminStats = createServerFn({ method: "GET" })
       supabaseAdmin.from("orders").select("id", { count: "exact", head: true }),
       supabaseAdmin.from("products").select("id", { count: "exact", head: true }),
       supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }),
-      supabaseAdmin.from("orders").select("id,subtotal,status,created_at"),
+      supabaseAdmin.from("orders").select("id,subtotal,delivery_charge,status,created_at"),
       supabaseAdmin
         .from("orders")
-        .select("id,order_number,full_name,subtotal,status,created_at")
+        .select("id,order_number,full_name,subtotal,delivery_charge,status,created_at")
         .order("created_at", { ascending: false })
         .limit(10),
       supabaseAdmin
@@ -33,8 +33,8 @@ export const getAdminStats = createServerFn({ method: "GET" })
 
     const totalSales = (allOrders ?? [])
       .filter((o) => o.status === "delivered")
-      .reduce((s, o) => s + Number(o.subtotal ?? 0), 0);
-    const totalRevenue = (allOrders ?? []).reduce((s, o) => s + Number(o.subtotal ?? 0), 0);
+      .reduce((s, o) => s + Number(o.subtotal ?? 0) + Number(o.delivery_charge ?? 0), 0);
+    const totalRevenue = (allOrders ?? []).reduce((s, o) => s + Number(o.subtotal ?? 0) + Number(o.delivery_charge ?? 0), 0);
 
     // Daily last 30 days
     const days: { date: string; sales: number; orders: number }[] = [];
@@ -50,7 +50,7 @@ export const getAdminStats = createServerFn({ method: "GET" })
       const k = new Date(o.created_at).toISOString().slice(5, 10);
       const i = dayIdx.get(k);
       if (i != null) {
-        days[i].sales += Number(o.subtotal ?? 0);
+        days[i].sales += Number(o.subtotal ?? 0) + Number(o.delivery_charge ?? 0);
         days[i].orders += 1;
       }
     });
@@ -68,7 +68,7 @@ export const getAdminStats = createServerFn({ method: "GET" })
       const k = d.toLocaleString("en-US", { month: "short", year: "2-digit" });
       const i = monthIdx.get(k);
       if (i != null) {
-        months[i].sales += Number(o.subtotal ?? 0);
+        months[i].sales += Number(o.subtotal ?? 0) + Number(o.delivery_charge ?? 0);
         months[i].orders += 1;
       }
     });
