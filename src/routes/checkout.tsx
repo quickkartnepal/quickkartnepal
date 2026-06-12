@@ -7,7 +7,7 @@ import { getMyProfile } from "@/lib/user.functions";
 import { useAuth } from "@/lib/auth";
 import { getDeliveryCharge, STANDARD_DELIVERY } from "@/lib/delivery";
 import { toast } from "sonner";
-import { BadgeCheck, Truck, Tag } from "lucide-react";
+import { BadgeCheck, Tag } from "lucide-react";
 import { PROVINCES, districtsOf, municipalitiesOf } from "@/lib/nepal-address";
 
 export const Route = createFileRoute("/checkout")({
