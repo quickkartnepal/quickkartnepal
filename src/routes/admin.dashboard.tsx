@@ -365,7 +365,9 @@ function OrdersTab() {
                 {["pending", "confirmed", "shipped", "delivered", "cancelled"].map((s) => (<option key={s} value={s}>{s}</option>))}
               </select>
               {o.promo_code && <span className="rounded-full bg-accent/20 px-3 py-1 text-xs font-semibold">{o.promo_code} -Rs.{Number(o.discount).toLocaleString()}</span>}
-              <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold">Rs. {Number(o.subtotal).toLocaleString()}</span>
+              <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold">Subtotal: Rs. {Number(o.subtotal).toLocaleString()}</span>
+              {Number(o.delivery_charge) > 0 && <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold">+ Delivery Rs. {Number(o.delivery_charge).toLocaleString()}</span>}
+              <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">Total: Rs. {(Number(o.subtotal) + Number(o.delivery_charge)).toLocaleString()}</span>
             </div>
           </div>
           <div className="mt-3 grid gap-3 text-sm sm:grid-cols-3">

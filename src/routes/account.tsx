@@ -134,7 +134,8 @@ function Account() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold capitalize">{o.status}</span>
-                      <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">Rs. {Number(o.subtotal).toLocaleString()}</span>
+                      {Number(o.delivery_charge) > 0 && <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold">+ Delivery Rs. {Number(o.delivery_charge).toLocaleString()}</span>}
+                      <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">Total: Rs. {(Number(o.subtotal) + Number(o.delivery_charge)).toLocaleString()}</span>
                     </div>
                   </div>
                   <ul className="mt-3 space-y-1 text-sm">

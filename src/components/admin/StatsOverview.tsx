@@ -84,7 +84,8 @@ export function StatsOverview() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="rounded-full bg-secondary px-2 py-0.5 text-xs capitalize">{o.status}</span>
-                  <span className="font-semibold">Rs. {Number(o.subtotal).toLocaleString()}</span>
+                  {Number(o.delivery_charge) > 0 && <span className="text-xs text-muted-foreground">+ Delivery Rs. {Number(o.delivery_charge).toLocaleString()}</span>}
+                  <span className="font-semibold">Rs. {(Number(o.subtotal) + Number(o.delivery_charge)).toLocaleString()}</span>
                 </div>
               </div>
             ))}
