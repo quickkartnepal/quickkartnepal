@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { getDeliveryCharge } from "@/lib/delivery";
 
 export const validatePromo = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
@@ -124,6 +125,8 @@ export const placeOrder = createServerFn({ method: "POST" })
       }
     } catch {}
 
+    const { charge: deliveryCharge, discount: deliveryDiscount } = getDeliveryCharge(subtotal);
+
     const { data: order, error: oErr } = await supabaseAdmin
       .from("orders")
       .insert({
@@ -139,6 +142,8 @@ export const placeOrder = createServerFn({ method: "POST" })
         notes: data.notes ?? null,
         subtotal: subtotal - discount,
         discount,
+        delivery_charge: deliveryCharge,
+        delivery_discount: deliveryDiscount,
         promo_code: promoCode,
         payment_method: "COD",
         status: "pending",
@@ -173,7 +178,7 @@ export const placeOrder = createServerFn({ method: "POST" })
     );
     if (iErr) throw new Error(iErr.message);
 
-    return { order_number: order.order_number, id: order.id, subtotal: subtotal - discount };
+    return { order_number: order.order_number, id: order.id, subtotal: subtotal - discount, delivery_charge: deliveryCharge };
   });
 
 export const submitReview = createServerFn({ method: "POST" })
