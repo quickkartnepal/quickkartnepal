@@ -151,7 +151,7 @@ function CheckoutPage() {
                 placeholder="Type your municipality, e.g. Birtamod"
                 onChange={(e) => {
                   const hit = lookupMunicipality(e.target.value);
-                  if (hit) setForm((f) => ({ ...f, province: hit.province, district: hit.district, municipality: hit.municipality }));
+                  if (hit) setForm((f) => ({ ...f, province: hit.province, district: hit.district, municipality: hit.municipality, ward: "" }));
                 }}
               />
               <datalist id="municipality-list">
@@ -166,7 +166,7 @@ function CheckoutPage() {
               <div>
                 <label className="text-xs font-medium text-muted-foreground">Province</label>
                 <select required value={form.province}
-                  onChange={(e) => setForm({ ...form, province: e.target.value, district: "", municipality: "" })}
+                  onChange={(e) => setForm({ ...form, province: e.target.value, district: "", municipality: "", ward: "" })}
                   className={fieldClass}>
                   <option value="">Select Province</option>
                   {PROVINCES.map((p) => <option key={p} value={p}>{p}</option>)}
@@ -175,7 +175,7 @@ function CheckoutPage() {
               <div>
                 <label className="text-xs font-medium text-muted-foreground">District</label>
                 <select required disabled={!form.province} value={form.district}
-                  onChange={(e) => setForm({ ...form, district: e.target.value, municipality: "" })}
+                  onChange={(e) => setForm({ ...form, district: e.target.value, municipality: "", ward: "" })}
                   className={fieldClass}>
                   <option value="">Select District</option>
                   {districts.map((d) => <option key={d} value={d}>{d}</option>)}
@@ -184,7 +184,8 @@ function CheckoutPage() {
               <div>
                 <label className="text-xs font-medium text-muted-foreground">Municipality / VDC</label>
                 <select required disabled={!form.district} value={form.municipality}
-                  onChange={(e) => setForm({ ...form, municipality: e.target.value })}
+                  onChange={(e) => setForm({ ...form, municipality: e.target.value, ward: "" })}
+
                   className={fieldClass}>
                   <option value="">Select Municipality</option>
                   {municipalities.map((m) => <option key={m} value={m}>{m}</option>)}
