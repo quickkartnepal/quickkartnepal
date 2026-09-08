@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { getDeliveryCharge, STANDARD_DELIVERY } from "@/lib/delivery";
 import { toast } from "sonner";
 import { BadgeCheck, Tag } from "lucide-react";
-import { PROVINCES, districtsOf, municipalitiesOf, ALL_MUNICIPALITIES, lookupMunicipality } from "@/lib/nepal-address";
+import { PROVINCES, districtsOf, municipalitiesOf, ALL_MUNICIPALITIES, lookupMunicipality, wardsOf } from "@/lib/nepal-address";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [{ title: "Checkout — Quick Kart Nepal" }] }),
@@ -56,6 +56,7 @@ function CheckoutPage() {
 
   const districts = useMemo(() => districtsOf(form.province), [form.province]);
   const municipalities = useMemo(() => municipalitiesOf(form.province, form.district), [form.province, form.district]);
+  const wards = useMemo(() => wardsOf(form.province, form.district, form.municipality), [form.province, form.district, form.municipality]);
 
   if (items.length === 0) {
     return (
@@ -150,7 +151,7 @@ function CheckoutPage() {
                 placeholder="Type your municipality, e.g. Birtamod"
                 onChange={(e) => {
                   const hit = lookupMunicipality(e.target.value);
-                  if (hit) setForm((f) => ({ ...f, province: hit.province, district: hit.district, municipality: hit.municipality }));
+                  if (hit) setForm((f) => ({ ...f, province: hit.province, district: hit.district, municipality: hit.municipality, ward: "" }));
                 }}
               />
               <datalist id="municipality-list">
@@ -165,7 +166,7 @@ function CheckoutPage() {
               <div>
                 <label className="text-xs font-medium text-muted-foreground">Province</label>
                 <select required value={form.province}
-                  onChange={(e) => setForm({ ...form, province: e.target.value, district: "", municipality: "" })}
+                  onChange={(e) => setForm({ ...form, province: e.target.value, district: "", municipality: "", ward: "" })}
                   className={fieldClass}>
                   <option value="">Select Province</option>
                   {PROVINCES.map((p) => <option key={p} value={p}>{p}</option>)}
@@ -174,7 +175,7 @@ function CheckoutPage() {
               <div>
                 <label className="text-xs font-medium text-muted-foreground">District</label>
                 <select required disabled={!form.province} value={form.district}
-                  onChange={(e) => setForm({ ...form, district: e.target.value, municipality: "" })}
+                  onChange={(e) => setForm({ ...form, district: e.target.value, municipality: "", ward: "" })}
                   className={fieldClass}>
                   <option value="">Select District</option>
                   {districts.map((d) => <option key={d} value={d}>{d}</option>)}
@@ -183,17 +184,25 @@ function CheckoutPage() {
               <div>
                 <label className="text-xs font-medium text-muted-foreground">Municipality / VDC</label>
                 <select required disabled={!form.district} value={form.municipality}
-                  onChange={(e) => setForm({ ...form, municipality: e.target.value })}
+                  onChange={(e) => setForm({ ...form, municipality: e.target.value, ward: "" })}
+
                   className={fieldClass}>
                   <option value="">Select Municipality</option>
                   {municipalities.map((m) => <option key={m} value={m}>{m}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground">Ward No.</label>
-                <input required type="number" min={1} max={35} value={form.ward}
-                  onChange={(e) => setForm({ ...form, ward: e.target.value })} className={fieldClass} placeholder="e.g. 5" />
+                <label className="text-xs font-medium text-muted-foreground">Area / Ward No.</label>
+                <select required disabled={!form.municipality} value={form.ward}
+                  onChange={(e) => setForm({ ...form, ward: e.target.value })}
+                  className={fieldClass}>
+                  <option value="">Select Ward</option>
+                  {wards.map((w) => (
+                    <option key={w} value={String(w)}>{form.municipality} - Ward {w}</option>
+                  ))}
+                </select>
               </div>
+
               <div className="sm:col-span-2">
                 <label className="text-xs font-medium text-muted-foreground">Tole / Local Area</label>
                 <input maxLength={120} value={form.tole} onChange={(e) => setForm({ ...form, tole: e.target.value })}
