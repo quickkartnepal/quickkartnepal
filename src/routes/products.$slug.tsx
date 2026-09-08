@@ -141,7 +141,7 @@ function ProductPage() {
 
           <div className="mt-5 space-y-2 rounded-xl border border-border bg-secondary/40 p-4 text-sm">
             <div className="flex items-center gap-2"><BadgeCheck className="h-4 w-4 text-accent" /> Cash on Delivery available all over Nepal</div>
-            <div className="flex items-center gap-2"><Truck className="h-4 w-4 text-accent" /> Delivery charge will be determined after order completion based on location</div>
+            <div className="flex items-center gap-2"><Truck className="h-4 w-4 text-accent" /> Flat delivery charge Rs. 150 anywhere in Nepal</div>
           </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
