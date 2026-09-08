@@ -265,7 +265,13 @@ function ProductForm({ product, onCancel, onSave, saving }: { product: Partial<P
       <h2 className="font-display text-xl text-primary">{product.id ? "Edit product" : "Add product"}</h2>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <Field label="Name"><input required maxLength={200} className="input" value={p.name} onChange={(e) => setP({ ...p, name: e.target.value })} /></Field>
-        <Field label="Category"><input maxLength={80} className="input" value={p.category} onChange={(e) => setP({ ...p, category: e.target.value })} /></Field>
+        <Field label="Category">
+          <select className="input" value={p.category} onChange={(e) => setP({ ...p, category: e.target.value })}>
+            <option value="">Select category</option>
+            <option value="Shoes">Shoes</option>
+            <option value="Electronics">Electronics</option>
+          </select>
+        </Field>
         <Field label="Price (Rs.)"><input required type="number" min={0} step="0.01" className="input" value={p.price} onChange={(e) => setP({ ...p, price: e.target.value })} /></Field>
         <Field label="Discount Price (Rs.)"><input type="number" min={0} step="0.01" className="input" value={p.discount_price} onChange={(e) => setP({ ...p, discount_price: e.target.value })} /></Field>
 

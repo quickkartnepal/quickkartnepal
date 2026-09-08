@@ -28,11 +28,11 @@ function useProducts() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id,slug,name,price,discount_price,images,rating,is_featured,is_trending")
+        .select("id,slug,name,price,discount_price,images,rating,is_featured,is_trending,category")
         .eq("is_active", true)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as Array<ProductCardData & { is_featured: boolean; is_trending: boolean }>;
+      return (data ?? []) as Array<ProductCardData & { is_featured: boolean; is_trending: boolean; category: string | null }>;
     },
   });
 }
@@ -153,18 +153,52 @@ function Section({ title, kicker, products, loading }: { title: string; kicker: 
   );
 }
 
+const CATEGORIES = [
+  { key: "all", label: "All Products" },
+  { key: "shoes", label: "Shoes" },
+  { key: "electronics", label: "Electronics" },
+];
+
+function matchesCategory(cat: string | null, key: string) {
+  if (key === "all") return true;
+  const c = (cat ?? "").toLowerCase();
+  if (key === "shoes") return c.includes("shoe") || c.includes("footwear") || c.includes("sandal") || c.includes("slipper");
+  return c.includes("electr") || c.includes("gadget");
+}
+
 function Home() {
   const { data, isLoading } = useProducts();
+  const [cat, setCat] = useState("all");
   const featured = (data ?? []).filter((p) => p.is_featured);
-  const trending = (data ?? []).filter((p) => p.is_trending);
+  const filtered = (data ?? []).filter((p) => matchesCategory(p.category, cat));
   return (
     <>
       <HeroSlider />
       <HighlightBar />
       <div id="products" />
       <Section title="Featured Products" kicker="Hand-picked" products={featured} loading={isLoading} />
-      <Section title="Trending Now" kicker="What's hot" products={trending} loading={isLoading} />
-      <Section title="All Products" kicker="Browse" products={data ?? []} loading={isLoading} />
+      <section className="mx-auto max-w-7xl px-4 pt-4">
+        <div className="text-xs font-semibold uppercase tracking-widest text-accent">Shop by category</div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {CATEGORIES.map((c) => (
+            <button
+              key={c.key}
+              onClick={() => setCat(c.key)}
+              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                cat === c.key ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary hover:text-primary"
+              }`}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+      </section>
+      <Section
+        title={CATEGORIES.find((c) => c.key === cat)?.label ?? "All Products"}
+        kicker="Browse"
+        products={filtered}
+        loading={isLoading}
+      />
       <section className="bg-heritage">
         <div className="mx-auto max-w-7xl px-4 py-10 text-center sm:py-12">
           <h2 className="font-display text-2xl text-primary sm:text-3xl">Discover the spirit of Nepal</h2>

@@ -102,3 +102,18 @@ export const NEPAL_ADDRESS: NepalData = {
 export const PROVINCES = Object.keys(NEPAL_ADDRESS);
 export const districtsOf = (p: string) => Object.keys(NEPAL_ADDRESS[p] ?? {});
 export const municipalitiesOf = (p: string, d: string) => NEPAL_ADDRESS[p]?.[d] ?? [];
+
+export type MunicipalityEntry = { municipality: string; district: string; province: string };
+
+export const ALL_MUNICIPALITIES: MunicipalityEntry[] = Object.entries(NEPAL_ADDRESS).flatMap(
+  ([province, districts]) =>
+    Object.entries(districts).flatMap(([district, munis]) =>
+      munis.map((municipality) => ({ municipality, district, province })),
+    ),
+);
+
+export function lookupMunicipality(name: string): MunicipalityEntry | undefined {
+  const key = name.trim().toLowerCase();
+  if (!key) return undefined;
+  return ALL_MUNICIPALITIES.find((m) => m.municipality.toLowerCase() === key);
+}

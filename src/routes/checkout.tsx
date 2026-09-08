@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { getDeliveryCharge, STANDARD_DELIVERY } from "@/lib/delivery";
 import { toast } from "sonner";
 import { BadgeCheck, Tag } from "lucide-react";
-import { PROVINCES, districtsOf, municipalitiesOf } from "@/lib/nepal-address";
+import { PROVINCES, districtsOf, municipalitiesOf, ALL_MUNICIPALITIES, lookupMunicipality } from "@/lib/nepal-address";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [{ title: "Checkout — Quick Kart Nepal" }] }),
@@ -80,7 +80,7 @@ function CheckoutPage() {
   };
 
   const total = Math.max(0, subtotal - (promoApplied?.discount ?? 0));
-  const { charge: deliveryCharge, discount: deliveryDiscount, discountPercent } = getDeliveryCharge(subtotal);
+  const { charge: deliveryCharge } = getDeliveryCharge(subtotal);
   const grandTotal = total + deliveryCharge;
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -142,6 +142,25 @@ function CheckoutPage() {
 
           <div className="rounded-lg border border-border p-3">
             <div className="mb-2 text-sm font-semibold text-primary">Delivery Address (Nepal)</div>
+            <div className="mb-3">
+              <label className="text-xs font-medium text-muted-foreground">Search your Municipality / VDC (province &amp; district fill automatically)</label>
+              <input
+                list="municipality-list"
+                className={fieldClass}
+                placeholder="Type your municipality, e.g. Birtamod"
+                onChange={(e) => {
+                  const hit = lookupMunicipality(e.target.value);
+                  if (hit) setForm((f) => ({ ...f, province: hit.province, district: hit.district, municipality: hit.municipality }));
+                }}
+              />
+              <datalist id="municipality-list">
+                {ALL_MUNICIPALITIES.map((m) => (
+                  <option key={`${m.province}-${m.district}-${m.municipality}`} value={m.municipality}>
+                    {m.district}, {m.province}
+                  </option>
+                ))}
+              </datalist>
+            </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <label className="text-xs font-medium text-muted-foreground">Province</label>
@@ -238,19 +257,13 @@ function CheckoutPage() {
           )}
           <div className="flex justify-between text-sm">
             <span>Delivery</span>
-            <span>{deliveryCharge === 0 ? "Free" : `Rs. ${deliveryCharge.toLocaleString()}`}</span>
+            <span>Rs. {deliveryCharge.toLocaleString()}</span>
           </div>
-          {deliveryDiscount > 0 && (
-            <div className="flex justify-between text-xs text-green-600">
-              <span>Delivery discount ({discountPercent}%)</span>
-              <span>- Rs. {deliveryDiscount.toLocaleString()}</span>
-            </div>
-          )}
           <div className="mt-1 flex justify-between font-semibold">
             <span>Grand Total</span><span>Rs. {grandTotal.toLocaleString()}</span>
           </div>
           <div className="mt-3 rounded-lg border border-border bg-secondary/40 p-2 text-xs text-muted-foreground">
-            <strong>Delivery info:</strong> Standard delivery Rs. {STANDARD_DELIVERY}. Orders Rs. 1,500–2,500 get 30% off, Rs. 2,500–3,000 get 50% off, Rs. 3,000+ get free delivery.
+            <strong>Delivery info:</strong> Flat delivery charge of Rs. {STANDARD_DELIVERY} for all locations in Nepal.
           </div>
         </aside>
       </div>

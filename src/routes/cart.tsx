@@ -10,7 +10,7 @@ export const Route = createFileRoute("/cart")({
 
 function CartPage() {
   const { items, setQty, remove, subtotal } = useCart();
-  const { charge, discount, discountPercent } = getDeliveryCharge(subtotal);
+  const { charge } = getDeliveryCharge(subtotal);
   const grandTotal = subtotal + charge;
 
   if (items.length === 0) {
@@ -52,19 +52,13 @@ function CartPage() {
           <div className="mt-3 flex justify-between text-sm"><span>Subtotal</span><span>Rs. {subtotal.toLocaleString()}</span></div>
           <div className="flex justify-between text-sm">
             <span>Delivery</span>
-            <span>{charge === 0 ? "Free" : `Rs. ${charge.toLocaleString()}`}</span>
+            <span>Rs. {charge.toLocaleString()}</span>
           </div>
-          {discount > 0 && (
-            <div className="flex justify-between text-xs text-green-600">
-              <span>Delivery discount ({discountPercent}%)</span>
-              <span>- Rs. {discount.toLocaleString()}</span>
-            </div>
-          )}
           <div className="mt-1 flex justify-between font-semibold">
             <span>Total</span><span>Rs. {grandTotal.toLocaleString()}</span>
           </div>
           <div className="mt-3 rounded-lg border border-border bg-secondary/40 p-2 text-xs text-muted-foreground">
-            <strong>Delivery info:</strong> Standard delivery Rs. {STANDARD_DELIVERY}. Orders Rs. 1,500–2,500 get 30% off, Rs. 2,500–3,000 get 50% off, Rs. 3,000+ get free delivery.
+            <strong>Delivery info:</strong> Flat delivery charge of Rs. {STANDARD_DELIVERY} for all locations in Nepal.
           </div>
           <Link to="/checkout" className="btn-gold mt-4 block rounded-full px-4 py-3 text-center text-sm font-semibold">
             Proceed to Checkout (COD)
