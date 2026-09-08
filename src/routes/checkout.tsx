@@ -190,10 +190,17 @@ function CheckoutPage() {
                 </select>
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground">Ward No.</label>
-                <input required type="number" min={1} max={35} value={form.ward}
-                  onChange={(e) => setForm({ ...form, ward: e.target.value })} className={fieldClass} placeholder="e.g. 5" />
+                <label className="text-xs font-medium text-muted-foreground">Area / Ward No.</label>
+                <select required disabled={!form.municipality} value={form.ward}
+                  onChange={(e) => setForm({ ...form, ward: e.target.value })}
+                  className={fieldClass}>
+                  <option value="">Select Ward</option>
+                  {wards.map((w) => (
+                    <option key={w} value={String(w)}>{form.municipality} - Ward {w}</option>
+                  ))}
+                </select>
               </div>
+
               <div className="sm:col-span-2">
                 <label className="text-xs font-medium text-muted-foreground">Tole / Local Area</label>
                 <input maxLength={120} value={form.tole} onChange={(e) => setForm({ ...form, tole: e.target.value })}
