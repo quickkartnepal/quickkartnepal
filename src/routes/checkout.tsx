@@ -56,6 +56,7 @@ function CheckoutPage() {
 
   const districts = useMemo(() => districtsOf(form.province), [form.province]);
   const municipalities = useMemo(() => municipalitiesOf(form.province, form.district), [form.province, form.district]);
+  const wards = useMemo(() => wardsOf(form.province, form.district, form.municipality), [form.province, form.district, form.municipality]);
 
   if (items.length === 0) {
     return (
