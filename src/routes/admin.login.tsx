@@ -2,9 +2,12 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
-import { ensureAdminUser } from "@/lib/admin.functions";
+import { ensureAdminUser, verifyAdminPassword } from "@/lib/admin.functions";
 import { toast } from "sonner";
 import { Lock } from "lucide-react";
+
+// Every admin login is verified a second time through this mailbox.
+const OTP_EMAIL = "infoquickkartnepal@gmail.com";
 
 export const Route = createFileRoute("/admin/login")({
   head: () => ({ meta: [{ title: "Admin Login — Quick Kart Nepal" }, { name: "robots", content: "noindex" }] }),
@@ -13,9 +16,12 @@ export const Route = createFileRoute("/admin/login")({
 
 function AdminLogin() {
   const ensure = useServerFn(ensureAdminUser);
+  const verifyPassword = useServerFn(verifyAdminPassword);
   const nav = useNavigate();
-  const [email, setEmail] = useState("infoquickkartnepal@gmail.com");
+  const [email, setEmail] = useState(OTP_EMAIL);
   const [password, setPassword] = useState("");
+  const [step, setStep] = useState<"password" | "otp">("password");
+  const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
 
   // Ensure the admin user record exists on first visit (idempotent)
@@ -23,14 +29,36 @@ function AdminLogin() {
     ensure().catch(() => {});
   }, [ensure]);
 
+  const sendCode = async () => {
+    const { error } = await supabase.auth.signInWithOtp({
+      email: OTP_EMAIL,
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo: `${window.location.origin}/admin/dashboard`,
+      },
+    });
+    if (error) throw error;
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      toast.success("Welcome back");
-      nav({ to: "/admin/dashboard" });
+      if (step === "password") {
+        await verifyPassword({ data: { email, password } });
+        await sendCode();
+        setStep("otp");
+        toast.success(`Verification sent to ${OTP_EMAIL}`);
+      } else {
+        const { error } = await supabase.auth.verifyOtp({
+          email: OTP_EMAIL,
+          token: code.trim(),
+          type: "email",
+        });
+        if (error) throw error;
+        toast.success("Welcome back");
+        nav({ to: "/admin/dashboard" });
+      }
     } catch (e: any) {
       toast.error(e?.message ?? "Login failed");
     } finally { setBusy(false); }
@@ -45,12 +73,31 @@ function AdminLogin() {
         <h1 className="mt-4 font-display text-2xl text-primary">Admin Login</h1>
         <p className="mt-1 text-xs text-muted-foreground">Restricted access. Authorized personnel only.</p>
         <form onSubmit={onSubmit} className="mt-5 space-y-3">
-          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Email" />
-          <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Password" />
+          {step === "password" ? (
+            <>
+              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Email" />
+              <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Password" />
+            </>
+          ) : (
+            <>
+              <p className="text-xs text-muted-foreground">
+                A verification message was sent to {OTP_EMAIL}. Enter the code from that email,
+                or simply open the secure link inside it to finish signing in.
+              </p>
+              <input inputMode="numeric" autoComplete="one-time-code" required value={code}
+                onChange={(e) => setCode(e.target.value)}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-center text-lg tracking-[0.4em]"
+                placeholder="000000" />
+              <button type="button" onClick={() => sendCode().then(() => toast.success("Code re-sent")).catch((e) => toast.error(e?.message ?? "Could not resend"))}
+                className="w-full text-xs text-muted-foreground underline">
+                Resend code
+              </button>
+            </>
+          )}
           <button disabled={busy} className="btn-gold w-full rounded-full py-2.5 text-sm font-semibold">
-            {busy ? "Signing in…" : "Sign in"}
+            {busy ? "Please wait…" : step === "password" ? "Continue" : "Verify & sign in"}
           </button>
         </form>
       </div>
