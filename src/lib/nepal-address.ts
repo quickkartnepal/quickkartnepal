@@ -127,7 +127,7 @@ const WARD_COUNTS: Record<string, number> = {
   Butwal: 19, Dharan: 20, Kalaiya: 27, Itahari: 20, Nepalgunj: 23,
   Tulsipur: 19, Jitpur: 24, "Jeetpur Simara": 24, Bhaktapur: 10,
   Birendranagar: 16, Tikapur: 9, Damak: 10, Mechinagar: 15, Birtamod: 10,
-  Bhimdatta: 19, Gulariya: 12, Kirtipur: 10, Madhyapur Thimi: 9,
+  Bhimdatta: 19, Gulariya: 12, Kirtipur: 10, "Madhyapur Thimi": 9,
   Lahan: 24, Rajbiraj: 16, Siddharthanagar: 13, Tansen: 14, Waling: 14,
   Banepa: 14, Dhulikhel: 12, Bidur: 13, Panauti: 12, Kohalpur: 15,
 };
