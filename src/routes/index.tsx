@@ -153,24 +153,32 @@ function Section({ title, kicker, products, loading }: { title: string; kicker: 
   );
 }
 
-const CATEGORIES = [
-  { key: "all", label: "All Products" },
-  { key: "shoes", label: "Shoes" },
-  { key: "electronics", label: "Electronics" },
-];
-
-function matchesCategory(cat: string | null, key: string) {
-  if (key === "all") return true;
-  const c = (cat ?? "").toLowerCase();
-  if (key === "shoes") return c.includes("shoe") || c.includes("footwear") || c.includes("sandal") || c.includes("slipper");
-  return c.includes("electr") || c.includes("gadget");
+function useCategories() {
+  return useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("id,name,sort_order")
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
 }
 
 function Home() {
   const { data, isLoading } = useProducts();
+  const { data: cats } = useCategories();
   const [cat, setCat] = useState("all");
+  const CATEGORIES = [
+    { key: "all", label: "All Products" },
+    ...(cats ?? []).map((c) => ({ key: c.name.toLowerCase(), label: c.name })),
+  ];
   const featured = (data ?? []).filter((p) => p.is_featured);
-  const filtered = (data ?? []).filter((p) => matchesCategory(p.category, cat));
+  const filtered =
+    cat === "all" ? (data ?? []) : (data ?? []).filter((p) => (p.category ?? "").toLowerCase() === cat);
+
   return (
     <>
       <HeroSlider />
