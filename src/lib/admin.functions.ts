@@ -393,3 +393,34 @@ export const changeAdminPassword = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// --- Admin login step 1: verify password WITHOUT creating a session ----
+export const verifyAdminPassword = createServerFn({ method: "POST" })
+  .inputValidator((d: { email: string; password: string }) =>
+    z.object({ email: z.string().email(), password: z.string().min(1) }).parse(d),
+  )
+  .handler(async ({ data }) => {
+    const { createClient } = await import("@supabase/supabase-js");
+    const client = createClient(
+      process.env["SUPABASE_URL"]!,
+      process.env["SUPABASE_PUBLISHABLE_KEY"] ?? process.env["SUPABASE_ANON_KEY"]!,
+      { auth: { persistSession: false, autoRefreshToken: false } },
+    );
+    const { data: res, error } = await client.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    });
+    if (error || !res.user) throw new Error("Invalid email or password");
+    // Immediately discard the session — the browser only gets a session after
+    // the emailed verification code/link is confirmed.
+    await client.auth.signOut();
+
+    const { data: role } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", res.user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (!role) throw new Error("This account is not an administrator");
+    return { ok: true };
+  });
