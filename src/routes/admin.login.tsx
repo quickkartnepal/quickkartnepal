@@ -50,15 +50,27 @@ function AdminLogin() {
         setStep("otp");
         toast.success(`Verification sent to ${OTP_EMAIL}`);
       } else {
-        const { error } = await supabase.auth.verifyOtp({
-          email: OTP_EMAIL,
-          token: code.trim(),
-          type: "email",
-        });
-        if (error) throw error;
+        const entry = code.trim();
+        // Accept either the 6-digit code or the secure link pasted from the email,
+        // so the admin can finish signing in without leaving this tab.
+        if (entry.startsWith("http")) {
+          const url = new URL(entry);
+          const token = url.searchParams.get("token") ?? url.searchParams.get("token_hash");
+          if (!token) throw new Error("That link does not contain a verification token");
+          const { error } = await supabase.auth.verifyOtp({ token_hash: token, type: "email" });
+          if (error) throw error;
+        } else {
+          const { error } = await supabase.auth.verifyOtp({
+            email: OTP_EMAIL,
+            token: entry,
+            type: "email",
+          });
+          if (error) throw error;
+        }
         toast.success("Welcome back");
         nav({ to: "/admin/dashboard" });
       }
+
     } catch (e: any) {
       toast.error(e?.message ?? "Login failed");
     } finally { setBusy(false); }
@@ -83,13 +95,13 @@ function AdminLogin() {
           ) : (
             <>
               <p className="text-xs text-muted-foreground">
-                A verification message was sent to {OTP_EMAIL}. Enter the code from that email,
-                or simply open the secure link inside it to finish signing in.
+                A verification message was sent to {OTP_EMAIL}. Enter the 6-digit code from that
+                email — or paste the secure link from it here — to finish signing in on this tab.
               </p>
-              <input inputMode="numeric" autoComplete="one-time-code" required value={code}
+              <input autoComplete="one-time-code" required value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-center text-lg tracking-[0.4em]"
-                placeholder="000000" />
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-center text-sm"
+                placeholder="000000 or paste link" />
               <button type="button" onClick={() => sendCode().then(() => toast.success("Code re-sent")).catch((e) => toast.error(e?.message ?? "Could not resend"))}
                 className="w-full text-xs text-muted-foreground underline">
                 Resend code

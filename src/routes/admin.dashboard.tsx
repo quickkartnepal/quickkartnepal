@@ -21,7 +21,7 @@ import { LogOut, Package, ShoppingBag, Plus, Pencil, Trash2, Image as ImageIcon,
 import { StatsOverview } from "@/components/admin/StatsOverview";
 import { listAffiliatesAdmin, listPaymentRequestsAdmin, updatePaymentRequestAdmin } from "@/lib/affiliate.functions";
 
-type Tab = "overview" | "products" | "orders" | "banners" | "promos" | "affiliates" | "payouts" | "settings";
+type Tab = "overview" | "products" | "categories" | "orders" | "banners" | "promos" | "affiliates" | "payouts" | "settings";
 
 export const Route = createFileRoute("/admin/dashboard")({
   head: () => ({ meta: [{ title: "Admin Dashboard — Quick Kart Nepal" }, { name: "robots", content: "noindex" }] }),
@@ -50,6 +50,7 @@ function Dashboard() {
   const tabs: { id: Tab; label: string; icon: any }[] = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "products", label: "Products", icon: Package },
+    { id: "categories", label: "Categories", icon: Tag },
     { id: "orders", label: "Orders", icon: ShoppingBag },
     { id: "banners", label: "Banners", icon: ImageIcon },
     { id: "promos", label: "Promo Codes", icon: Tag },
@@ -82,6 +83,7 @@ function Dashboard() {
       <div className="mt-6">
         {tab === "overview" && <StatsOverview />}
         {tab === "products" && <ProductsTab />}
+        {tab === "categories" && <CategoriesTab />}
         {tab === "orders" && <OrdersTab />}
         {tab === "banners" && <BannersTab />}
         {tab === "promos" && <PromosTab />}
@@ -231,6 +233,14 @@ function ProductForm({ product, onCancel, onSave, saving }: { product: Partial<P
     category: product.category ?? "",
   });
   const [uploading, setUploading] = useState(false);
+  const { data: categories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("categories").select("id,name,sort_order").order("sort_order");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
 
   const onImageUpload = async (files: FileList | null) => {
     if (!files || !files.length) return;
@@ -268,8 +278,9 @@ function ProductForm({ product, onCancel, onSave, saving }: { product: Partial<P
         <Field label="Category">
           <select className="input" value={p.category} onChange={(e) => setP({ ...p, category: e.target.value })}>
             <option value="">Select category</option>
-            <option value="Shoes">Shoes</option>
-            <option value="Electronics">Electronics</option>
+            {(categories ?? []).map((c: any) => (
+              <option key={c.id} value={c.name}>{c.name}</option>
+            ))}
           </select>
         </Field>
         <Field label="Price (Rs.)"><input required type="number" min={0} step="0.01" className="input" value={p.price} onChange={(e) => setP({ ...p, price: e.target.value })} /></Field>
@@ -700,6 +711,84 @@ function PayoutsTab() {
           )}
         </div>
       ))}
+    </div>
+  );
+}
+
+function CategoriesTab() {
+  const qc = useQueryClient();
+  const [name, setName] = useState("");
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("categories").select("*").order("sort_order");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const add = useMutation({
+    mutationFn: async (n: string) => {
+      const { error } = await supabase
+        .from("categories")
+        .insert({ name: n.trim(), sort_order: (data?.length ?? 0) + 1 });
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Category added"); setName(""); qc.invalidateQueries({ queryKey: ["categories"] }); },
+    onError: (e: any) => toast.error(e?.message ?? "Could not add category"),
+  });
+
+  const remove = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("categories").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Category deleted"); qc.invalidateQueries({ queryKey: ["categories"] }); },
+    onError: (e: any) => toast.error(e?.message ?? "Could not delete category"),
+  });
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
+      <h2 className="font-display text-xl text-primary">Categories</h2>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Categories appear on the home page and in the product form.
+      </p>
+      <form
+        onSubmit={(e) => { e.preventDefault(); if (name.trim()) add.mutate(name); }}
+        className="mt-4 flex flex-wrap gap-2"
+      >
+        <input
+          className="input max-w-xs flex-1"
+          placeholder="New category name"
+          value={name}
+          maxLength={60}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <button disabled={add.isPending} className="btn-gold inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold">
+          <Plus className="h-4 w-4" /> Add
+        </button>
+      </form>
+
+      {isLoading ? (
+        <p className="mt-4 text-sm text-muted-foreground">Loading…</p>
+      ) : (data ?? []).length === 0 ? (
+        <p className="mt-4 text-sm text-muted-foreground">No categories yet.</p>
+      ) : (
+        <ul className="mt-4 divide-y divide-border">
+          {(data ?? []).map((c: any) => (
+            <li key={c.id} className="flex items-center justify-between py-2 text-sm">
+              <span>{c.name}</span>
+              <button
+                onClick={() => { if (confirm(`Delete category "${c.name}"?`)) remove.mutate(c.id); }}
+                className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-xs hover:border-destructive hover:text-destructive"
+              >
+                <Trash2 className="h-3.5 w-3.5" /> Delete
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
