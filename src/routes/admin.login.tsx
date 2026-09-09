@@ -50,15 +50,27 @@ function AdminLogin() {
         setStep("otp");
         toast.success(`Verification sent to ${OTP_EMAIL}`);
       } else {
-        const { error } = await supabase.auth.verifyOtp({
-          email: OTP_EMAIL,
-          token: code.trim(),
-          type: "email",
-        });
-        if (error) throw error;
+        const entry = code.trim();
+        // Accept either the 6-digit code or the secure link pasted from the email,
+        // so the admin can finish signing in without leaving this tab.
+        if (entry.startsWith("http")) {
+          const url = new URL(entry);
+          const token = url.searchParams.get("token") ?? url.searchParams.get("token_hash");
+          if (!token) throw new Error("That link does not contain a verification token");
+          const { error } = await supabase.auth.verifyOtp({ token_hash: token, type: "email" });
+          if (error) throw error;
+        } else {
+          const { error } = await supabase.auth.verifyOtp({
+            email: OTP_EMAIL,
+            token: entry,
+            type: "email",
+          });
+          if (error) throw error;
+        }
         toast.success("Welcome back");
         nav({ to: "/admin/dashboard" });
       }
+
     } catch (e: any) {
       toast.error(e?.message ?? "Login failed");
     } finally { setBusy(false); }
