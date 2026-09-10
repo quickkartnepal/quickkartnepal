@@ -9,6 +9,24 @@ import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { submitReview } from "@/lib/shop.functions";
 
+// Product descriptions are often pasted as one long run-on line with emoji
+// markers. Break them into readable lines: first on real line breaks, then
+// before each emoji so every feature/point sits on its own line.
+const EMOJI_SPLIT = /(?=[\p{Extended_Pictographic}])/u;
+
+function formatDescription(text: string | null | undefined): string[] {
+  const base = String(text ?? "")
+    .split(/\r?\n+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return base
+    .flatMap((line) => (line.length > 120 ? line.split(EMOJI_SPLIT) : [line]))
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+
+
 export const Route = createFileRoute("/products/$slug")({
   head: ({ params }) => ({
     meta: [
@@ -92,11 +110,11 @@ function ProductPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
-      <div className="grid gap-8 md:grid-cols-2">
-        <div>
-          <div className="aspect-square overflow-hidden rounded-xl border border-border bg-card">
+      <div className="grid items-start gap-8 md:grid-cols-2">
+        <div className="w-full md:sticky md:top-24">
+          <div className="aspect-square w-full overflow-hidden rounded-xl border border-border bg-card">
             {images[imgIdx] && (
-              <img src={images[imgIdx]} alt={product.name} className="h-full w-full object-cover" />
+              <img src={images[imgIdx]} alt={product.name} className="h-full w-full object-contain" />
             )}
           </div>
           {images.length > 1 && (
@@ -113,11 +131,12 @@ function ProductPage() {
             </div>
           )}
           {product.video_url && (
-            <div className="mt-4 overflow-hidden rounded-xl border border-border">
-              <video src={product.video_url} controls className="w-full" />
+            <div className="mt-4 aspect-video w-full overflow-hidden rounded-xl border border-border bg-black">
+              <video src={product.video_url} controls playsInline className="h-full w-full object-contain" />
             </div>
           )}
         </div>
+
 
         <div>
           <h1 className="font-display text-3xl text-primary">{product.name}</h1>
@@ -137,7 +156,13 @@ function ProductPage() {
             )}
           </div>
 
-          <p className="mt-4 text-sm leading-relaxed text-foreground/85">{product.description}</p>
+          <div className="mt-4 space-y-2 text-sm leading-relaxed text-foreground/85">
+            {formatDescription(product.description).map((line, i) => (
+              <p key={i} className="break-words">{line}</p>
+            ))}
+          </div>
+
+
 
           <div className="mt-5 space-y-2 rounded-xl border border-border bg-secondary/40 p-4 text-sm">
             <div className="flex items-center gap-2"><BadgeCheck className="h-4 w-4 text-accent" /> Cash on Delivery available all over Nepal</div>
