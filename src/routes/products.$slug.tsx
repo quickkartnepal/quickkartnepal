@@ -9,6 +9,24 @@ import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { submitReview } from "@/lib/shop.functions";
 
+// Product descriptions are often pasted as one long run-on line with emoji
+// markers. Break them into readable lines: first on real line breaks, then
+// before each emoji so every feature/point sits on its own line.
+const EMOJI_SPLIT = /(?=[\p{Extended_Pictographic}])/u;
+
+function formatDescription(text: string | null | undefined): string[] {
+  const base = String(text ?? "")
+    .split(/\r?\n+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return base
+    .flatMap((line) => (line.length > 120 ? line.split(EMOJI_SPLIT) : [line]))
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+
+
 export const Route = createFileRoute("/products/$slug")({
   head: ({ params }) => ({
     meta: [
