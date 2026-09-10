@@ -92,11 +92,11 @@ function ProductPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
-      <div className="grid gap-8 md:grid-cols-2">
-        <div>
-          <div className="aspect-square overflow-hidden rounded-xl border border-border bg-card">
+      <div className="grid items-start gap-8 md:grid-cols-2">
+        <div className="w-full md:sticky md:top-24">
+          <div className="aspect-square w-full overflow-hidden rounded-xl border border-border bg-card">
             {images[imgIdx] && (
-              <img src={images[imgIdx]} alt={product.name} className="h-full w-full object-cover" />
+              <img src={images[imgIdx]} alt={product.name} className="h-full w-full object-contain" />
             )}
           </div>
           {images.length > 1 && (
@@ -113,11 +113,12 @@ function ProductPage() {
             </div>
           )}
           {product.video_url && (
-            <div className="mt-4 overflow-hidden rounded-xl border border-border">
-              <video src={product.video_url} controls className="w-full" />
+            <div className="mt-4 aspect-video w-full overflow-hidden rounded-xl border border-border bg-black">
+              <video src={product.video_url} controls playsInline className="h-full w-full object-contain" />
             </div>
           )}
         </div>
+
 
         <div>
           <h1 className="font-display text-3xl text-primary">{product.name}</h1>
@@ -138,14 +139,11 @@ function ProductPage() {
           </div>
 
           <div className="mt-4 space-y-2 text-sm leading-relaxed text-foreground/85">
-            {String(product.description ?? "")
-              .split(/\r?\n+/)
-              .map((line) => line.trim())
-              .filter(Boolean)
-              .map((line, i) => (
-                <p key={i} className="whitespace-pre-line break-words">{line}</p>
-              ))}
+            {formatDescription(product.description).map((line, i) => (
+              <p key={i} className="break-words">{line}</p>
+            ))}
           </div>
+
 
 
           <div className="mt-5 space-y-2 rounded-xl border border-border bg-secondary/40 p-4 text-sm">
