@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { getDeliveryCharge, STANDARD_DELIVERY } from "@/lib/delivery";
 import { toast } from "sonner";
 import { BadgeCheck, Tag } from "lucide-react";
-import { PROVINCES, districtsOf, municipalitiesOf, ALL_MUNICIPALITIES, lookupMunicipality, wardsOf } from "@/lib/nepal-address";
+import { PROVINCES, districtsOf, municipalitiesOf, wardsOf } from "@/lib/nepal-address";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [{ title: "Checkout — Quick Kart Nepal" }] }),
