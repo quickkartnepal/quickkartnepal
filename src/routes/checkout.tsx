@@ -143,25 +143,8 @@ function CheckoutPage() {
 
           <div className="rounded-lg border border-border p-3">
             <div className="mb-2 text-sm font-semibold text-primary">Delivery Address (Nepal)</div>
-            <div className="mb-3">
-              <label className="text-xs font-medium text-muted-foreground">Search your Municipality / VDC (province &amp; district fill automatically)</label>
-              <input
-                list="municipality-list"
-                className={fieldClass}
-                placeholder="Type your municipality, e.g. Birtamod"
-                onChange={(e) => {
-                  const hit = lookupMunicipality(e.target.value);
-                  if (hit) setForm((f) => ({ ...f, province: hit.province, district: hit.district, municipality: hit.municipality, ward: "" }));
-                }}
-              />
-              <datalist id="municipality-list">
-                {ALL_MUNICIPALITIES.map((m) => (
-                  <option key={`${m.province}-${m.district}-${m.municipality}`} value={m.municipality}>
-                    {m.district}, {m.province}
-                  </option>
-                ))}
-              </datalist>
-            </div>
+            <p className="mb-3 text-xs text-muted-foreground">Choose your Province first, then District, Municipality and finally your Area / Ward.</p>
+
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <label className="text-xs font-medium text-muted-foreground">Province</label>

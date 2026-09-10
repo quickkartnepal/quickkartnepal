@@ -137,7 +137,16 @@ function ProductPage() {
             )}
           </div>
 
-          <p className="mt-4 text-sm leading-relaxed text-foreground/85">{product.description}</p>
+          <div className="mt-4 space-y-2 text-sm leading-relaxed text-foreground/85">
+            {String(product.description ?? "")
+              .split(/\r?\n+/)
+              .map((line) => line.trim())
+              .filter(Boolean)
+              .map((line, i) => (
+                <p key={i} className="whitespace-pre-line break-words">{line}</p>
+              ))}
+          </div>
+
 
           <div className="mt-5 space-y-2 rounded-xl border border-border bg-secondary/40 p-4 text-sm">
             <div className="flex items-center gap-2"><BadgeCheck className="h-4 w-4 text-accent" /> Cash on Delivery available all over Nepal</div>
