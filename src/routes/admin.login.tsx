@@ -1,8 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useServerFn } from "@tanstack/react-start";
-import { ensureAdminUser, verifyAdminPassword } from "@/lib/admin.functions";
 import { toast } from "sonner";
 import { Lock } from "lucide-react";
 
@@ -15,8 +13,6 @@ export const Route = createFileRoute("/admin/login")({
 });
 
 function AdminLogin() {
-  const ensure = useServerFn(ensureAdminUser);
-  const verifyPassword = useServerFn(verifyAdminPassword);
   const nav = useNavigate();
   const [email, setEmail] = useState(OTP_EMAIL);
   const [password, setPassword] = useState("");
@@ -24,10 +20,20 @@ function AdminLogin() {
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
 
-  // Ensure the admin user record exists on first visit (idempotent)
-  useEffect(() => {
-    ensure().catch(() => {});
-  }, [ensure]);
+  // Step 1 runs entirely in the browser so the login works on any host,
+  // without needing server-only backend keys.
+  const checkPassword = async () => {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error || !data.user) throw new Error("Invalid email or password");
+    const { data: isAdmin } = await supabase.rpc("has_role", {
+      _user_id: data.user.id,
+      _role: "admin",
+    });
+    // Drop the session immediately — access is only granted after the
+    // emailed verification step below.
+    await supabase.auth.signOut();
+    if (!isAdmin) throw new Error("This account is not an administrator");
+  };
 
   const sendCode = async () => {
     const { error } = await supabase.auth.signInWithOtp({
@@ -39,6 +45,7 @@ function AdminLogin() {
     });
     if (error) throw error;
   };
+
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
