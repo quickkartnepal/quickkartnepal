@@ -52,7 +52,7 @@ function AdminLogin() {
     setBusy(true);
     try {
       if (step === "password") {
-        await verifyPassword({ data: { email, password } });
+        await checkPassword();
         await sendCode();
         setStep("otp");
         toast.success(`Verification sent to ${OTP_EMAIL}`);
