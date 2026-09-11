@@ -8,7 +8,15 @@ import { Lock } from "lucide-react";
 const OTP_EMAIL = "infoquickkartnepal@gmail.com";
 
 export const Route = createFileRoute("/admin/login")({
-  head: () => ({ meta: [{ title: "Admin Login — Quick Kart Nepal" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [
+    { title: "Admin Login — Quick Kart Nepal" },
+    { name: "description", content: "Secure administrator login for Quick Kart Nepal." },
+    { property: "og:title", content: "Admin Login — Quick Kart Nepal" },
+    { property: "og:description", content: "Secure administrator login for Quick Kart Nepal." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+    { name: "robots", content: "noindex" },
+  ] }),
   component: AdminLogin,
 });
 
@@ -58,22 +66,13 @@ function AdminLogin() {
         toast.success(`Verification sent to ${OTP_EMAIL}`);
       } else {
         const entry = code.trim();
-        // Accept either the 6-digit code or the secure link pasted from the email,
-        // so the admin can finish signing in without leaving this tab.
-        if (entry.startsWith("http")) {
-          const url = new URL(entry);
-          const token = url.searchParams.get("token") ?? url.searchParams.get("token_hash");
-          if (!token) throw new Error("That link does not contain a verification token");
-          const { error } = await supabase.auth.verifyOtp({ token_hash: token, type: "email" });
-          if (error) throw error;
-        } else {
-          const { error } = await supabase.auth.verifyOtp({
-            email: OTP_EMAIL,
-            token: entry,
-            type: "email",
-          });
-          if (error) throw error;
-        }
+        if (!/^\d{6}$/.test(entry)) throw new Error("Enter the 6-digit code from your email");
+        const { error } = await supabase.auth.verifyOtp({
+          email: OTP_EMAIL,
+          token: entry,
+          type: "email",
+        });
+        if (error) throw error;
         toast.success("Welcome back");
         nav({ to: "/admin/dashboard" });
       }
@@ -102,13 +101,12 @@ function AdminLogin() {
           ) : (
             <>
               <p className="text-xs text-muted-foreground">
-                A verification message was sent to {OTP_EMAIL}. Enter the 6-digit code from that
-                email — or paste the secure link from it here — to finish signing in on this tab.
+                A 6-digit verification code was sent to {OTP_EMAIL}. Enter it here to finish signing in.
               </p>
-              <input autoComplete="one-time-code" required value={code}
-                onChange={(e) => setCode(e.target.value)}
+              <input autoComplete="one-time-code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-center text-sm"
-                placeholder="000000 or paste link" />
+                placeholder="000000" />
               <button type="button" onClick={() => sendCode().then(() => toast.success("Code re-sent")).catch((e) => toast.error(e?.message ?? "Could not resend"))}
                 className="w-full text-xs text-muted-foreground underline">
                 Resend code
