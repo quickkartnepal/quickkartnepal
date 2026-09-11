@@ -219,6 +219,24 @@ export type Database = {
         }
         Relationships: []
       }
+      checkout_requests: {
+        Row: {
+          payload: Json
+          request_id: string
+          request_kind: string
+        }
+        Insert: {
+          payload: Json
+          request_id: string
+          request_kind: string
+        }
+        Update: {
+          payload?: Json
+          request_id?: string
+          request_kind?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
