@@ -219,6 +219,24 @@ export type Database = {
         }
         Relationships: []
       }
+      checkout_requests: {
+        Row: {
+          payload: Json
+          request_id: string
+          request_kind: string
+        }
+        Insert: {
+          payload: Json
+          request_id: string
+          request_kind: string
+        }
+        Update: {
+          payload?: Json
+          request_id?: string
+          request_kind?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
@@ -541,6 +559,28 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      place_cod_order: {
+        Args: {
+          _address: string
+          _affiliate_code?: string
+          _district: string
+          _full_name: string
+          _items: Json
+          _maps_link: string
+          _municipality: string
+          _notes: string
+          _phone: string
+          _promo_code: string
+          _province: string
+          _tole: string
+          _ward: string
+        }
+        Returns: Json
+      }
+      validate_checkout_promo: {
+        Args: { _code: string; _subtotal: number }
+        Returns: Json
       }
     }
     Enums: {

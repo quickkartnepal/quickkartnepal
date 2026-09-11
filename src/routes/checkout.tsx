@@ -2,9 +2,9 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useCart } from "@/lib/cart";
 import { useServerFn } from "@tanstack/react-start";
-import { placeOrder, validatePromo } from "@/lib/shop.functions";
 import { getMyProfile } from "@/lib/user.functions";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 import { getDeliveryCharge, STANDARD_DELIVERY } from "@/lib/delivery";
 import { toast } from "sonner";
 import { BadgeCheck, Tag } from "lucide-react";
@@ -18,8 +18,6 @@ export const Route = createFileRoute("/checkout")({
 function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
   const nav = useNavigate();
-  const submit = useServerFn(placeOrder);
-  const validate = useServerFn(validatePromo);
   const profileFn = useServerFn(getMyProfile);
   const { user } = useAuth();
   const [form, setForm] = useState({
@@ -71,7 +69,13 @@ function CheckoutPage() {
     if (!promoCode.trim()) return;
     setApplying(true);
     try {
-      const res = await validate({ data: { code: promoCode.trim(), subtotal } });
+      const { data, error } = await supabase.rpc("validate_checkout_promo", {
+        _code: promoCode.trim(),
+        _subtotal: subtotal,
+      });
+      if (error) throw error;
+      if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("Invalid promo code");
+      const res = data as { code: string; discount: number };
       setPromoApplied({ code: res.code, discount: res.discount });
       toast.success(`Applied ${res.code} — Rs. ${res.discount.toLocaleString()} off`);
     } catch (e: any) {
@@ -94,23 +98,28 @@ function CheckoutPage() {
     const fullAddress = [form.tole, form.municipality, `Ward ${form.ward}`, form.district, form.province]
       .filter(Boolean).join(", ") + (form.address ? ` — ${form.address}` : "");
     try {
-      const res = await submit({
-        data: {
-          full_name: form.full_name,
-          phone: form.phone,
-          address: fullAddress,
-          province: form.province,
-          district: form.district,
-          municipality: form.municipality,
-          ward: form.ward,
-          tole: form.tole || null,
-          maps_link: form.maps_link || null,
-          notes: form.notes || null,
-          promo_code: promoApplied?.code ?? null,
-          user_id: user?.id ?? null,
-          items: items.map((i) => ({ product_id: i.id, quantity: i.quantity })),
-        },
+      const referral = document.cookie
+        .split("; ")
+        .find((entry) => entry.startsWith("qk_ref="))
+        ?.split("=")[1];
+      const { data, error } = await supabase.rpc("place_cod_order", {
+        _full_name: form.full_name,
+        _phone: form.phone,
+        _address: fullAddress,
+        _province: form.province,
+        _district: form.district,
+        _municipality: form.municipality,
+        _ward: form.ward,
+        _tole: form.tole,
+        _maps_link: form.maps_link,
+        _notes: form.notes,
+        _promo_code: promoApplied?.code ?? "",
+        _items: items.map((i) => ({ product_id: i.id, quantity: i.quantity })),
+        _affiliate_code: referral ? decodeURIComponent(referral) : "",
       });
+      if (error) throw error;
+      if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("Failed to place order");
+      const res = data as { order_number: string };
       clear();
       nav({ to: "/order-success", search: { o: res.order_number } });
     } catch (e: any) {
