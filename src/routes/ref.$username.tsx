@@ -1,41 +1,32 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
+// Runs in the browser so referral links work on any host (no private keys needed).
 export const Route = createFileRoute("/ref/$username")({
-  server: {
-    handlers: {
-      GET: async ({ params, request }) => {
-        const username = String(params.username || "").toLowerCase().slice(0, 40);
-        const cookie = `qk_ref=${encodeURIComponent(username)}; Path=/; Max-Age=${60 * 60 * 24 * 30}; SameSite=Lax`;
-
-        // Fire and forget click tracking
-        try {
-          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-          const { data: aff } = await supabaseAdmin
-            .from("affiliates")
-            .select("id")
-            .eq("username", username)
-            .maybeSingle();
-          if (aff) {
-            const ip =
-              request.headers.get("cf-connecting-ip") ||
-              request.headers.get("x-forwarded-for") ||
-              "";
-            const ua = request.headers.get("user-agent") || "";
-            await supabaseAdmin.from("affiliate_clicks").insert({
-              affiliate_id: aff.id,
-              ip_hash: ip ? Buffer.from(ip).toString("base64").slice(0, 32) : null,
-              user_agent: ua.slice(0, 200),
-            });
-          }
-        } catch {
-          // ignore tracking errors
-        }
-
-        return new Response(null, {
-          status: 302,
-          headers: { Location: "/", "Set-Cookie": cookie },
-        });
-      },
-    },
-  },
+  ssr: false,
+  head: () => ({ meta: [
+    { title: "Redirecting — Quick Kart Nepal" },
+    { name: "description", content: "Taking you to Quick Kart Nepal." },
+    { property: "og:title", content: "Quick Kart Nepal" },
+    { property: "og:description", content: "Shop shoes and electronics with Cash on Delivery all over Nepal." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+    { name: "robots", content: "noindex" },
+  ] }),
+  component: RefRedirect,
 });
+
+function RefRedirect() {
+  const { username } = Route.useParams();
+  const nav = useNavigate();
+  useEffect(() => {
+    const u = String(username || "").toLowerCase().trim().slice(0, 40);
+    if (u) {
+      document.cookie = `qk_ref=${encodeURIComponent(u)}; Path=/; Max-Age=${60 * 60 * 24 * 30}; SameSite=Lax`;
+      supabase.rpc("record_affiliate_click", { _username: u, _user_agent: navigator.userAgent }).then(() => {}, () => {});
+    }
+    nav({ to: "/", replace: true });
+  }, [username, nav]);
+  return <div className="mx-auto max-w-md px-4 py-16 text-center text-sm text-muted-foreground">Loading…</div>;
+}
