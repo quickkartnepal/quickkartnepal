@@ -230,7 +230,7 @@ function CheckoutPage() {
           <ul className="mt-3 space-y-2 text-sm">
             {items.map((i) => (
               <li key={i.id} className="flex justify-between gap-3">
-                <span className="truncate">{i.name} × {i.quantity}</span>
+                <span className="truncate">{i.name}{i.size ? ` (EU ${i.size})` : ""} × {i.quantity}</span>
                 <span className="shrink-0">Rs. {(i.price * i.quantity).toLocaleString()}</span>
               </li>
             ))}

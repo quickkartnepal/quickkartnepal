@@ -34,6 +34,7 @@ function CartPage() {
               </div>
               <div className="flex flex-1 flex-col">
                 <div className="text-sm font-semibold">{it.name}</div>
+                {it.size && <div className="text-xs text-muted-foreground">Size: EU {it.size}</div>}
                 <div className="text-sm text-primary">Rs. {it.price.toLocaleString()}</div>
                 <div className="mt-auto flex items-center justify-between">
                   <div className="inline-flex items-center rounded-full border border-border">
