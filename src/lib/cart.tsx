@@ -6,7 +6,10 @@ export type CartItem = {
   price: number;
   image: string;
   quantity: number;
+  size?: string | null;
 };
+
+export const lineKey = (i: { id: string; size?: string | null }) => `${i.id}|${i.size ?? ""}`;
 
 type CartContextValue = {
   items: CartItem[];
@@ -39,16 +42,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const add: CartContextValue["add"] = (item, qty = 1) => {
     setItems((prev) => {
-      const existing = prev.find((p) => p.id === item.id);
+      const k = lineKey(item);
+      const existing = prev.find((p) => lineKey(p) === k);
       if (existing) {
-        return prev.map((p) => (p.id === item.id ? { ...p, quantity: p.quantity + qty } : p));
+        return prev.map((p) => (lineKey(p) === k ? { ...p, quantity: p.quantity + qty } : p));
       }
       return [...prev, { ...item, quantity: qty }];
     });
   };
-  const remove = (id: string) => setItems((p) => p.filter((i) => i.id !== id));
+  const remove = (id: string) => setItems((p) => p.filter((i) => lineKey(i) !== id));
   const setQty = (id: string, qty: number) =>
-    setItems((p) => p.map((i) => (i.id === id ? { ...i, quantity: Math.max(1, qty) } : i)));
+    setItems((p) => p.map((i) => (lineKey(i) === id ? { ...i, quantity: Math.max(1, qty) } : i)));
   const clear = () => setItems([]);
 
   const count = items.reduce((s, i) => s + i.quantity, 0);

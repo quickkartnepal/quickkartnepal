@@ -114,7 +114,7 @@ function CheckoutPage() {
         _maps_link: form.maps_link,
         _notes: form.notes,
         _promo_code: promoApplied?.code ?? "",
-        _items: items.map((i) => ({ product_id: i.id, quantity: i.quantity })),
+        _items: items.map((i) => ({ product_id: i.id, quantity: i.quantity, size: i.size ?? null })),
         _affiliate_code: referral ? decodeURIComponent(referral) : "",
       });
       if (error) throw error;

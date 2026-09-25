@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useCart } from "@/lib/cart";
+import { useCart, lineKey } from "@/lib/cart";
 import { getDeliveryCharge, STANDARD_DELIVERY } from "@/lib/delivery";
 import { Minus, Plus, Trash2 } from "lucide-react";
 
@@ -28,7 +28,7 @@ function CartPage() {
       <div className="mt-6 grid gap-6 md:grid-cols-[1fr_320px]">
         <div className="space-y-3">
           {items.map((it) => (
-            <div key={it.id} className="flex gap-4 rounded-xl border border-border bg-card p-3">
+            <div key={lineKey(it)} className="flex gap-4 rounded-xl border border-border bg-card p-3">
               <div className="h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-muted">
                 {it.image && <img src={it.image} alt={it.name} className="h-full w-full object-cover" />}
               </div>
@@ -37,11 +37,11 @@ function CartPage() {
                 <div className="text-sm text-primary">Rs. {it.price.toLocaleString()}</div>
                 <div className="mt-auto flex items-center justify-between">
                   <div className="inline-flex items-center rounded-full border border-border">
-                    <button onClick={() => setQty(it.id, it.quantity - 1)} className="grid h-8 w-8 place-items-center"><Minus className="h-3 w-3" /></button>
+                    <button onClick={() => setQty(lineKey(it), it.quantity - 1)} className="grid h-8 w-8 place-items-center"><Minus className="h-3 w-3" /></button>
                     <span className="w-8 text-center text-sm">{it.quantity}</span>
-                    <button onClick={() => setQty(it.id, it.quantity + 1)} className="grid h-8 w-8 place-items-center"><Plus className="h-3 w-3" /></button>
+                    <button onClick={() => setQty(lineKey(it), it.quantity + 1)} className="grid h-8 w-8 place-items-center"><Plus className="h-3 w-3" /></button>
                   </div>
-                  <button onClick={() => remove(it.id)} className="text-xs text-destructive hover:underline inline-flex items-center gap-1"><Trash2 className="h-3 w-3" /> Remove</button>
+                  <button onClick={() => remove(lineKey(it))} className="text-xs text-destructive hover:underline inline-flex items-center gap-1"><Trash2 className="h-3 w-3" /> Remove</button>
                 </div>
               </div>
             </div>

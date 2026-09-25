@@ -73,6 +73,7 @@ function ProductPage() {
   });
 
   const [imgIdx, setImgIdx] = useState(0);
+  const [size, setSize] = useState<string>("");
   const [rName, setRName] = useState("");
   const [rComment, setRComment] = useState("");
   const [rRating, setRRating] = useState(5);
@@ -86,12 +87,22 @@ function ProductPage() {
   const off = showDiscount ? Math.round((1 - Number(product.discount_price) / Number(product.price)) * 100) : 0;
   const images: string[] = product.images ?? [];
 
+  const sizes: string[] = (product as any).sizes ?? [];
+  const isShoe = /shoe|footwear/i.test(String(product.category ?? ""));
+  const needsSize = isShoe || sizes.length > 0;
+  const outOfStock = needsSize && sizes.length === 0;
+  const pick = () => {
+    if (outOfStock) { toast.error("This shoe is currently out of stock"); return false; }
+    if (needsSize && !size) { toast.error("Please choose your shoe size (EU)"); return false; }
+    add({ id: product.id, name: product.name, price: final, image: images[0] ?? "", size: needsSize ? size : null });
+    return true;
+  };
   const handleAdd = () => {
-    add({ id: product.id, name: product.name, price: final, image: images[0] ?? "" });
+    if (!pick()) return;
     toast.success("Added to cart");
   };
   const handleBuy = () => {
-    add({ id: product.id, name: product.name, price: final, image: images[0] ?? "" });
+    if (!pick()) return;
     nav({ to: "/checkout" });
   };
 
