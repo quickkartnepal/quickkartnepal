@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790355393925,
+      "tag": "0000_shoe_sizes_and_click_tracking",
+      "breakpoints": true
+    }
+  ]
+}

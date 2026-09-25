@@ -114,7 +114,7 @@ function CheckoutPage() {
         _maps_link: form.maps_link,
         _notes: form.notes,
         _promo_code: promoApplied?.code ?? "",
-        _items: items.map((i) => ({ product_id: i.id, quantity: i.quantity })),
+        _items: items.map((i) => ({ product_id: i.id, quantity: i.quantity, size: i.size ?? null })),
         _affiliate_code: referral ? decodeURIComponent(referral) : "",
       });
       if (error) throw error;
@@ -230,7 +230,7 @@ function CheckoutPage() {
           <ul className="mt-3 space-y-2 text-sm">
             {items.map((i) => (
               <li key={i.id} className="flex justify-between gap-3">
-                <span className="truncate">{i.name} × {i.quantity}</span>
+                <span className="truncate">{i.name}{i.size ? ` (EU ${i.size})` : ""} × {i.quantity}</span>
                 <span className="shrink-0">Rs. {(i.price * i.quantity).toLocaleString()}</span>
               </li>
             ))}

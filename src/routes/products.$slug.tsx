@@ -73,6 +73,7 @@ function ProductPage() {
   });
 
   const [imgIdx, setImgIdx] = useState(0);
+  const [size, setSize] = useState<string>("");
   const [rName, setRName] = useState("");
   const [rComment, setRComment] = useState("");
   const [rRating, setRRating] = useState(5);
@@ -86,12 +87,22 @@ function ProductPage() {
   const off = showDiscount ? Math.round((1 - Number(product.discount_price) / Number(product.price)) * 100) : 0;
   const images: string[] = product.images ?? [];
 
+  const sizes: string[] = (product as any).sizes ?? [];
+  const isShoe = /shoe|footwear/i.test(String(product.category ?? ""));
+  const needsSize = isShoe || sizes.length > 0;
+  const outOfStock = needsSize && sizes.length === 0;
+  const pick = () => {
+    if (outOfStock) { toast.error("This shoe is currently out of stock"); return false; }
+    if (needsSize && !size) { toast.error("Please choose your shoe size (EU)"); return false; }
+    add({ id: product.id, name: product.name, price: final, image: images[0] ?? "", size: needsSize ? size : null });
+    return true;
+  };
   const handleAdd = () => {
-    add({ id: product.id, name: product.name, price: final, image: images[0] ?? "" });
+    if (!pick()) return;
     toast.success("Added to cart");
   };
   const handleBuy = () => {
-    add({ id: product.id, name: product.name, price: final, image: images[0] ?? "" });
+    if (!pick()) return;
     nav({ to: "/checkout" });
   };
 
@@ -168,6 +179,24 @@ function ProductPage() {
             <div className="flex items-center gap-2"><BadgeCheck className="h-4 w-4 text-accent" /> Cash on Delivery available all over Nepal</div>
             <div className="flex items-center gap-2"><Truck className="h-4 w-4 text-accent" /> Flat delivery charge Rs. 150 anywhere in Nepal</div>
           </div>
+
+          {needsSize && (
+            <div className="mt-5">
+              <div className="text-sm font-semibold">Select Size (EU)</div>
+              {outOfStock ? (
+                <p className="mt-2 text-sm text-destructive">Currently out of stock</p>
+              ) : (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {sizes.map((sz) => (
+                    <button key={sz} type="button" onClick={() => setSize(sz)}
+                      className={`h-10 w-12 rounded-md border text-sm font-semibold ${size === sz ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary"}`}>
+                      {sz}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <button onClick={handleAdd} className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-primary px-6 py-3 text-sm font-semibold text-primary hover:bg-primary hover:text-primary-foreground">

@@ -114,8 +114,11 @@ function useUploader() {
 type ProductRow = {
   id: string; name: string; slug: string; description: string; price: number;
   discount_price: number | null; images: string[]; video_url: string | null;
-  rating: number; category: string | null; is_featured: boolean; is_trending: boolean; is_active: boolean;
+  rating: number; category: string | null; sizes?: string[]; is_featured: boolean; is_trending: boolean; is_active: boolean;
 };
+
+const SHOE_SIZES = ["36","37","38","39","40","41","42","43","44"];
+function isShoeCategory(c: string | null | undefined) { return /shoe|footwear/i.test(String(c ?? "")); }
 
 function emptyProduct(): Partial<ProductRow> {
   return { name: "", description: "", price: 0, discount_price: null, images: [], video_url: "", category: "", is_featured: false, is_trending: false, is_active: true };
@@ -147,6 +150,7 @@ function ProductsTab() {
         images: (p.images ?? []).filter(Boolean),
         video_url: p.video_url ? String(p.video_url).trim() : null,
         category: p.category || null,
+        sizes: isShoeCategory(p.category) ? (p.sizes ?? []) : [],
         is_featured: !!p.is_featured,
         is_trending: !!p.is_trending,
         is_active: p.is_active !== false,
@@ -206,6 +210,7 @@ function ProductsTab() {
                   <td className="p-3 text-xs">
                     {p.is_featured && <span className="mr-1 rounded bg-accent/20 px-1.5 py-0.5 text-accent-foreground">Featured</span>}
                     {p.is_trending && <span className="rounded bg-gold/30 px-1.5 py-0.5">Trending</span>}
+                    {isShoeCategory(p.category) && (p.sizes?.length ? <span className="ml-1 rounded bg-secondary px-1.5 py-0.5">EU {p.sizes.join(", ")}</span> : <span className="ml-1 rounded bg-destructive/15 px-1.5 py-0.5 text-destructive">No sizes</span>)}
                   </td>
                   <td className="p-3 text-xs">{p.is_active ? "Active" : "Hidden"}</td>
                   <td className="p-3 text-right">
@@ -231,6 +236,7 @@ function ProductForm({ product, onCancel, onSave, saving }: { product: Partial<P
     discount_price: product.discount_price ?? "",
     video_url: product.video_url ?? "",
     category: product.category ?? "",
+    sizes: Array.isArray(product.sizes) ? product.sizes : [],
   });
   const [uploading, setUploading] = useState(false);
   const { data: categories } = useQuery({
@@ -323,11 +329,28 @@ function ProductForm({ product, onCancel, onSave, saving }: { product: Partial<P
           </div>
         </Field>
 
+        {isShoeCategory(p.category) && (
+          <Field label="Shoe sizes in stock (EU)" full>
+            <div className="flex flex-wrap gap-2">
+              {SHOE_SIZES.map((sz) => {
+                const on = (p.sizes ?? []).includes(sz);
+                return (
+                  <button type="button" key={sz}
+                    onClick={() => setP({ ...p, sizes: on ? p.sizes.filter((x: string) => x !== sz) : [...(p.sizes ?? []), sz].sort() })}
+                    className={`h-10 w-12 rounded-md border text-sm font-semibold ${on ? "border-primary bg-primary text-primary-foreground" : "border-border"}`}>
+                    {sz}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">Tap to mark a size in stock. Only selected sizes are shown to customers.</p>
+          </Field>
+        )}
+
         <Field label="Description" full><textarea rows={5} maxLength={5000} className="input" value={p.description} onChange={(e) => setP({ ...p, description: e.target.value })} /></Field>
       </div>
       <p className="mt-3 text-xs text-muted-foreground">Rating is automatically calculated from customer reviews.</p>
       <div className="mt-4 flex flex-wrap gap-4 text-sm">
-        <label className="inline-flex items-center gap-2"><input type="checkbox" checked={!!p.is_featured} onChange={(e) => setP({ ...p, is_featured: e.target.checked })} /> Featured</label>
         <label className="inline-flex items-center gap-2"><input type="checkbox" checked={!!p.is_trending} onChange={(e) => setP({ ...p, is_trending: e.target.checked })} /> Trending</label>
         <label className="inline-flex items-center gap-2"><input type="checkbox" checked={p.is_active !== false} onChange={(e) => setP({ ...p, is_active: e.target.checked })} /> Active</label>
       </div>
@@ -398,7 +421,7 @@ function OrdersTab() {
             <div className="text-xs font-semibold uppercase text-muted-foreground">Items</div>
             <ul className="mt-2 space-y-1 text-sm">
               {o.items.map((it: any) => (
-                <li key={it.id} className="flex justify-between"><span>{it.product_name} × {it.quantity}</span><span>Rs. {(Number(it.unit_price) * it.quantity).toLocaleString()}</span></li>
+                <li key={it.id} className="flex justify-between"><span>{it.product_name}{it.size ? ` (EU ${it.size})` : ""} × {it.quantity}</span><span>Rs. {(Number(it.unit_price) * it.quantity).toLocaleString()}</span></li>
               ))}
             </ul>
           </div>

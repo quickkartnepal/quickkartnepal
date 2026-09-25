@@ -10,7 +10,11 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Quick Kart Nepal — Authentic Nepali Shopping with COD" },
-      { name: "description", content: "Shop curated Nepali products with Cash on Delivery all over Nepal. Featured and trending picks updated daily." },
+      { name: "description", content: "Shop shoes and electronics with Cash on Delivery all over Nepal. Trending picks updated daily." },
+      { property: "og:title", content: "Quick Kart Nepal — Shoes & Electronics with COD" },
+      { property: "og:description", content: "Shop shoes and electronics with Cash on Delivery all over Nepal." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,
@@ -175,7 +179,7 @@ function Home() {
     { key: "all", label: "All Products" },
     ...(cats ?? []).map((c) => ({ key: c.name.toLowerCase(), label: c.name })),
   ];
-  const featured = (data ?? []).filter((p) => p.is_featured);
+  const trending = (data ?? []).filter((p) => p.is_trending);
   const filtered =
     cat === "all" ? (data ?? []) : (data ?? []).filter((p) => (p.category ?? "").toLowerCase() === cat);
 
@@ -184,7 +188,9 @@ function Home() {
       <HeroSlider />
       <HighlightBar />
       <div id="products" />
-      <Section title="Featured Products" kicker="Hand-picked" products={featured} loading={isLoading} />
+      {(isLoading || trending.length > 0) && (
+        <Section title="Trending Now" kicker="Popular picks" products={trending} loading={isLoading} />
+      )}
       <section className="mx-auto max-w-7xl px-4 pt-4">
         <div className="text-xs font-semibold uppercase tracking-widest text-accent">Shop by category</div>
         <div className="mt-3 flex flex-wrap gap-2">

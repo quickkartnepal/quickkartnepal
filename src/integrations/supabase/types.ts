@@ -246,6 +246,7 @@ export type Database = {
           product_image: string | null
           product_name: string
           quantity: number
+          size: string | null
           unit_price: number
         }
         Insert: {
@@ -256,6 +257,7 @@ export type Database = {
           product_image?: string | null
           product_name: string
           quantity: number
+          size?: string | null
           unit_price: number
         }
         Update: {
@@ -266,6 +268,7 @@ export type Database = {
           product_image?: string | null
           product_name?: string
           quantity?: number
+          size?: string | null
           unit_price?: number
         }
         Relationships: [
@@ -418,6 +421,7 @@ export type Database = {
           name: string
           price: number
           rating: number
+          sizes: string[]
           slug: string
           updated_at: string
           video_url: string | null
@@ -435,6 +439,7 @@ export type Database = {
           name: string
           price: number
           rating?: number
+          sizes?: string[]
           slug: string
           updated_at?: string
           video_url?: string | null
@@ -452,6 +457,7 @@ export type Database = {
           name?: string
           price?: number
           rating?: number
+          sizes?: string[]
           slug?: string
           updated_at?: string
           video_url?: string | null
@@ -577,6 +583,10 @@ export type Database = {
           _ward: string
         }
         Returns: Json
+      }
+      record_affiliate_click: {
+        Args: { _user_agent?: string; _username: string }
+        Returns: boolean
       }
       validate_checkout_promo: {
         Args: { _code: string; _subtotal: number }

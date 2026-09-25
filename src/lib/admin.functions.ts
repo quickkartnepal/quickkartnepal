@@ -199,6 +199,7 @@ const productSchema = z.object({
   images: z.array(z.string().url()).max(10).default([]),
   video_url: z.string().url().nullable().optional(),
   category: z.string().max(80).nullable().optional(),
+  sizes: z.array(z.string().regex(/^\d{2}$/)).max(20).default([]),
   is_featured: z.boolean().default(false),
   is_trending: z.boolean().default(false),
   is_active: z.boolean().default(true),

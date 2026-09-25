@@ -141,7 +141,7 @@ function Account() {
                   <ul className="mt-3 space-y-1 text-sm">
                     {o.items.map((it: any) => (
                       <li key={it.id} className="flex justify-between">
-                        <span>{it.product_name} × {it.quantity}</span>
+                        <span>{it.product_name}{it.size ? ` (EU ${it.size})` : ""} × {it.quantity}</span>
                         <span>Rs. {(Number(it.unit_price) * it.quantity).toLocaleString()}</span>
                       </li>
                     ))}
