@@ -233,6 +233,35 @@ export const listAffiliatesAdmin = createServerFn({ method: "GET" })
     return { affiliates: enriched };
   });
 
+export const getAffiliateDetailsAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdminLocal(context.supabase, context.userId);
+    const { data: affiliate, error } = await supabaseAdmin.from("affiliates").select("*").eq("id", data.id).single();
+    if (error) throw new Error(error.message);
+    const [{ data: profile }, { data: orders }, { data: requests }, { data: clicks, count }] = await Promise.all([
+      supabaseAdmin.from("profiles").select("full_name,phone,address").eq("id", affiliate.user_id).maybeSingle(),
+      supabaseAdmin.from("affiliate_orders").select("id,order_id,product_count,commission,status,created_at").eq("affiliate_id", affiliate.id).order("created_at", { ascending: false }),
+      supabaseAdmin.from("affiliate_payment_requests").select("id,amount,full_name,status,admin_note,created_at").eq("affiliate_id", affiliate.id).order("created_at", { ascending: false }),
+      supabaseAdmin.from("affiliate_clicks").select("id,created_at", { count: "exact" }).eq("affiliate_id", affiliate.id).order("created_at", { ascending: false }).limit(50),
+    ]);
+    const orderIds = (orders ?? []).map((row) => row.order_id);
+    const [{ data: saleOrders }, { data: items }] = orderIds.length ? await Promise.all([
+      supabaseAdmin.from("orders").select("id,order_number,created_at,status,subtotal,delivery_charge,full_name,province,district,municipality,ward,tole").in("id", orderIds),
+      supabaseAdmin.from("order_items").select("order_id,product_name,quantity,size,unit_price").in("order_id", orderIds),
+    ]) : [{ data: [] }, { data: [] }];
+    return {
+      affiliate, profile, click_count: count ?? 0, recent_clicks: clicks ?? [],
+      requests: requests ?? [],
+      orders: (orders ?? []).map((row) => ({
+        ...row,
+        order: (saleOrders ?? []).find((sale) => sale.id === row.order_id) ?? null,
+        items: (items ?? []).filter((item) => item.order_id === row.order_id),
+      })),
+    };
+  });
+
 export const listPaymentRequestsAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
