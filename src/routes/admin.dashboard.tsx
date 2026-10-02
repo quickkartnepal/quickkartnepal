@@ -19,7 +19,8 @@ import {
 import { toast } from "sonner";
 import { LogOut, Package, ShoppingBag, Plus, Pencil, Trash2, Image as ImageIcon, Tag, KeyRound, Upload, X, LayoutDashboard, Users, Wallet } from "lucide-react";
 import { StatsOverview } from "@/components/admin/StatsOverview";
-import { listAffiliatesAdmin, listPaymentRequestsAdmin, updatePaymentRequestAdmin } from "@/lib/affiliate.functions";
+import { getAffiliateDetailsAdmin, listAffiliatesAdmin, listPaymentRequestsAdmin, updatePaymentRequestAdmin } from "@/lib/affiliate.functions";
+import { Button } from "@/components/ui/button";
 
 type Tab = "overview" | "products" | "categories" | "orders" | "banners" | "promos" | "affiliates" | "payouts" | "settings";
 
@@ -397,7 +398,7 @@ function OrdersTab() {
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
               <div className="font-mono text-sm font-semibold text-primary">{o.order_number}</div>
-              <div className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleString()}</div>
+               <div className="text-xs text-muted-foreground">Ordered: {new Date(o.created_at).toLocaleString("en-NP", { timeZone: "Asia/Kathmandu", dateStyle: "medium", timeStyle: "short" })} NPT</div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <select value={o.status} onChange={(e) => mut.mutate({ id: o.id, status: e.target.value })}
@@ -414,7 +415,11 @@ function OrdersTab() {
             <div><div className="text-xs uppercase text-muted-foreground">Customer</div><div className="font-medium">{o.full_name}</div></div>
             <div><div className="text-xs uppercase text-muted-foreground">Phone</div><div className="font-medium"><a href={`tel:${o.phone}`} className="text-primary">{o.phone}</a></div></div>
             <div><div className="text-xs uppercase text-muted-foreground">Payment</div><div className="font-medium">{o.payment_method}</div></div>
-            <div className="sm:col-span-3"><div className="text-xs uppercase text-muted-foreground">Address</div><div>{o.address}</div></div>
+             <div className="sm:col-span-3"><div className="text-xs uppercase text-muted-foreground">Delivery location</div>
+               <div className="font-medium">{[o.province, o.district, o.municipality, o.ward ? `Ward ${o.ward}` : null, o.tole].filter(Boolean).join(" · ") || "Location not provided"}</div>
+               <div className="mt-1 break-words">{o.address}</div>
+               {o.maps_link && <a href={o.maps_link} target="_blank" rel="noopener noreferrer" className="text-primary underline">Open map</a>}
+             </div>
             {o.notes && <div className="sm:col-span-3"><div className="text-xs uppercase text-muted-foreground">Notes</div><div>{o.notes}</div></div>}
           </div>
           <div className="mt-3 border-t border-border pt-3">
@@ -648,11 +653,31 @@ function SettingsTab() {
 // ---------------- Affiliates ----------------
 function AffiliatesTab() {
   const fetchFn = useServerFn(listAffiliatesAdmin);
+  const detailsFn = useServerFn(getAffiliateDetailsAdmin);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const { data, isLoading } = useQuery({ queryKey: ["admin-affiliates"], queryFn: () => fetchFn() });
+  const { data: details, isLoading: loadingDetails, error: detailsError } = useQuery({ queryKey: ["admin-affiliate-detail", selectedId], queryFn: () => detailsFn({ data: { id: selectedId ?? "" } }), enabled: !!selectedId });
   if (isLoading || !data) return <div className="text-sm text-muted-foreground">Loading…</div>;
   if (data.affiliates.length === 0)
     return <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">No affiliates yet.</div>;
   return (
+    selectedId ? <div className="space-y-4">
+      <Button variant="outline" onClick={() => setSelectedId(null)}>← All affiliates</Button>
+      {loadingDetails ? <p>Loading…</p> : detailsError ? <p className="text-destructive">Could not load affiliate details.</p> : details && <>
+        <div className="grid gap-2 border-b border-border pb-4 text-sm sm:grid-cols-2">
+          <div><h2 className="font-display text-2xl text-primary">@{details.affiliate.username}</h2><p>ID: <span className="break-all font-mono text-xs">{details.affiliate.id}</span></p></div>
+          <div><p>{details.profile?.full_name || "Name not provided"}</p><p>{details.profile?.phone || "No phone"}</p><p>{details.profile?.address || "No address"}</p><p>Joined {new Date(details.affiliate.created_at).toLocaleString("en-NP", { timeZone: "Asia/Kathmandu" })} NPT</p></div>
+        </div>
+        <div className="grid gap-3 text-sm sm:grid-cols-3"><p>Clicks: <strong>{details.click_count}</strong></p><p>Orders: <strong>{details.orders.length}</strong></p><p>Earnings: <strong>Rs. {details.orders.reduce((sum, row) => sum + Number(row.commission), 0).toLocaleString()}</strong></p></div>
+        <section><h3 className="mb-2 font-semibold">Referred orders</h3>{details.orders.length ? details.orders.map((row) => <div key={row.id} className="border-t border-border py-3 text-sm">
+          <div className="flex flex-wrap justify-between gap-2"><strong>{row.order?.order_number ?? row.order_id}</strong><span>{new Date(row.created_at).toLocaleString("en-NP", { timeZone: "Asia/Kathmandu" })} NPT</span></div>
+          <p>{row.order?.full_name} · {row.order?.status} · {row.product_count} products · Commission Rs. {Number(row.commission).toLocaleString()}</p>
+          <p className="text-muted-foreground">{row.items.map((item) => `${item.product_name}${item.size ? ` (EU ${item.size})` : ""} × ${item.quantity}`).join(", ")}</p>
+        </div>) : <p className="text-sm text-muted-foreground">No referred orders yet.</p>}</section>
+        <section><h3 className="mb-2 font-semibold">Withdrawal requests</h3>{details.requests.length ? details.requests.map((request) => <div key={request.id} className="flex flex-wrap justify-between gap-2 border-t border-border py-2 text-sm"><span>Rs. {Number(request.amount).toLocaleString()} · {request.status}{request.admin_note ? ` · ${request.admin_note}` : ""}</span><span>{new Date(request.created_at).toLocaleString("en-NP", { timeZone: "Asia/Kathmandu" })} NPT</span></div>) : <p className="text-sm text-muted-foreground">No requests yet.</p>}</section>
+        <section><h3 className="mb-2 font-semibold">Recent clicks</h3><p className="text-sm text-muted-foreground">{details.recent_clicks.length ? details.recent_clicks.map((click) => new Date(click.created_at).toLocaleString("en-NP", { timeZone: "Asia/Kathmandu" }) + " NPT").join(" · ") : "No clicks yet."}</p></section>
+      </>}
+    </div> :
     <div className="overflow-x-auto rounded-xl border border-border bg-card">
       <table className="w-full text-sm">
         <thead className="bg-secondary/60 text-left text-xs uppercase tracking-wider text-muted-foreground">
@@ -669,8 +694,9 @@ function AffiliatesTab() {
           {data.affiliates.map((a: any) => (
             <tr key={a.id} className="border-t border-border align-top">
               <td className="p-3">
-                <div className="font-medium">{a.full_name ?? "—"}</div>
-                <div className="text-xs text-muted-foreground">@{a.username}</div>
+                 <Button variant="link" className="h-auto p-0 font-medium" onClick={() => setSelectedId(a.id)}>{a.full_name || `@${a.username}`}</Button>
+                 <div><Button variant="link" className="h-auto p-0 font-mono text-xs text-muted-foreground" onClick={() => setSelectedId(a.id)} title="View affiliate details">{a.id}</Button></div>
+                 <div className="text-xs text-muted-foreground">@{a.username}</div>
                 {a.phone && <div className="text-xs text-muted-foreground">{a.phone}</div>}
               </td>
               <td className="p-3 text-xs text-muted-foreground">{new Date(a.created_at).toLocaleDateString()}</td>
