@@ -10,13 +10,13 @@ import { CheckCircle2, Globe, Wallet, Sparkles } from "lucide-react";
 export const Route = createFileRoute("/affiliate/")({
   head: () => ({
     meta: [
-      { title: "Affiliate Partner Program — Quick Kart Nepal" },
+      { title: "Affiliate Partner Program — Nextokart" },
       {
         name: "description",
         content:
-          "Join the Quick Kart Nepal affiliate program. Share your link, refer customers, and earn Rs. 70 for every product sold — no investment, work from anywhere.",
+          "Join the Nextokart affiliate program. Share your link, refer customers, and earn Rs. 70 for every product sold — no investment, work from anywhere.",
       },
-      { property: "og:title", content: "Affiliate Partner Program — Quick Kart Nepal" },
+      { property: "og:title", content: "Affiliate Partner Program — Nextokart" },
       {
         property: "og:description",
         content: "Earn Rs. 70 per product sold through your unique affiliate link.",
@@ -111,7 +111,7 @@ function AffiliatePage() {
             Earn Rs. 70 for every product you refer
           </h1>
           <p className="mt-4 text-muted-foreground">
-            The Quick Kart Nepal Affiliate Program lets anyone earn real income by simply sharing products
+            The Nextokart Affiliate Program lets anyone earn real income by simply sharing products
             they love. Whether you're a student, content creator, housewife, or full-time professional —
             you can turn your network into a steady source of income, without spending a single rupee.
           </p>

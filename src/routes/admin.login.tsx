@@ -9,10 +9,10 @@ const OTP_EMAIL = "infoquickkartnepal@gmail.com";
 
 export const Route = createFileRoute("/admin/login")({
   head: () => ({ meta: [
-    { title: "Admin Login — Quick Kart Nepal" },
-    { name: "description", content: "Secure administrator login for Quick Kart Nepal." },
-    { property: "og:title", content: "Admin Login — Quick Kart Nepal" },
-    { property: "og:description", content: "Secure administrator login for Quick Kart Nepal." },
+    { title: "Admin Login — Nextokart" },
+    { name: "description", content: "Secure administrator login for Nextokart." },
+    { property: "og:title", content: "Admin Login — Nextokart" },
+    { property: "og:description", content: "Secure administrator login for Nextokart." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },
     { name: "robots", content: "noindex" },

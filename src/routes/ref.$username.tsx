@@ -6,9 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/ref/$username")({
   ssr: false,
   head: () => ({ meta: [
-    { title: "Redirecting — Quick Kart Nepal" },
-    { name: "description", content: "Taking you to Quick Kart Nepal." },
-    { property: "og:title", content: "Quick Kart Nepal" },
+    { title: "Redirecting — Nextokart" },
+    { name: "description", content: "Taking you to Nextokart." },
+    { property: "og:title", content: "Nextokart" },
     { property: "og:description", content: "Shop shoes and electronics with Cash on Delivery all over Nepal." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },

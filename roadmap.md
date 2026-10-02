@@ -1,0 +1,5 @@
+- [ ] Rebrand website as Nextokart with uploaded logo/banner and new contact links.
+- [ ] Improve Nepal checkout address and shoe quantity controls.
+- [ ] Show complete admin order and affiliate worker details.
+- [ ] Enforce withdrawal balance and confirmation; add product image hover zoom.
+- [ ] Check mobile usability, verify flows, and complete package maintenance.

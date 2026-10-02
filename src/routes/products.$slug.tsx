@@ -30,7 +30,7 @@ function formatDescription(text: string | null | undefined): string[] {
 export const Route = createFileRoute("/products/$slug")({
   head: ({ params }) => ({
     meta: [
-      { title: `${params.slug} — Quick Kart Nepal` },
+      { title: `${params.slug} — Nextokart` },
       { name: "description", content: "Buy authentic Nepali products with Cash on Delivery all over Nepal." },
     ],
   }),
@@ -73,6 +73,7 @@ function ProductPage() {
   });
 
   const [imgIdx, setImgIdx] = useState(0);
+  const [zoom, setZoom] = useState<{ x: number; y: number } | null>(null);
   const [size, setSize] = useState<string>("");
   const [rName, setRName] = useState("");
   const [rComment, setRComment] = useState("");
@@ -123,9 +124,9 @@ function ProductPage() {
     <div className="mx-auto max-w-7xl px-4 py-8">
       <div className="grid items-start gap-8 md:grid-cols-2">
         <div className="w-full md:sticky md:top-24">
-          <div className="aspect-square w-full overflow-hidden rounded-xl border border-border bg-card">
+           <div className="aspect-square w-full overflow-hidden rounded-xl border border-border bg-card" onMouseMove={(event) => { const rect = event.currentTarget.getBoundingClientRect(); setZoom({ x: ((event.clientX - rect.left) / rect.width) * 100, y: ((event.clientY - rect.top) / rect.height) * 100 }); }} onMouseLeave={() => setZoom(null)}>
             {images[imgIdx] && (
-              <img src={images[imgIdx]} alt={product.name} className="h-full w-full object-contain" />
+               <img src={images[imgIdx]} alt={product.name} className="h-full w-full object-contain transition-transform duration-150 motion-reduce:transition-none md:cursor-zoom-in" style={{ transform: zoom ? "scale(2)" : "scale(1)", transformOrigin: zoom ? `${zoom.x}% ${zoom.y}%` : "center" }} />
             )}
           </div>
           {images.length > 1 && (
@@ -133,7 +134,7 @@ function ProductPage() {
               {images.map((src, i) => (
                 <button
                   key={i}
-                  onClick={() => setImgIdx(i)}
+                   onClick={() => { setImgIdx(i); setZoom(null); }}
                   className={`h-20 w-20 shrink-0 overflow-hidden rounded-lg border-2 ${i === imgIdx ? "border-primary" : "border-border"}`}
                 >
                   <img src={src} alt="" className="h-full w-full object-cover" />
@@ -142,7 +143,7 @@ function ProductPage() {
             </div>
           )}
           {product.video_url && (
-            <div className="mt-4 aspect-video w-full overflow-hidden rounded-xl border border-border bg-black">
+             <div className="mt-4 aspect-video w-full overflow-hidden rounded-xl border border-border bg-foreground">
               <video src={product.video_url} controls playsInline className="h-full w-full object-contain" />
             </div>
           )}

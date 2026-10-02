@@ -1,22 +1,23 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { useCart } from "@/lib/cart";
+import { useCart, lineKey } from "@/lib/cart";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyProfile } from "@/lib/user.functions";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { getDeliveryCharge, STANDARD_DELIVERY } from "@/lib/delivery";
 import { toast } from "sonner";
-import { BadgeCheck, Tag } from "lucide-react";
+import { BadgeCheck, Tag, Minus, Plus, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { PROVINCES, districtsOf, municipalitiesOf, wardsOf } from "@/lib/nepal-address";
 
 export const Route = createFileRoute("/checkout")({
-  head: () => ({ meta: [{ title: "Checkout — Quick Kart Nepal" }] }),
+  head: () => ({ meta: [{ title: "Checkout — Nextokart" }] }),
   component: CheckoutPage,
 });
 
 function CheckoutPage() {
-  const { items, subtotal, clear } = useCart();
+  const { items, subtotal, clear, setQty, remove } = useCart();
   const nav = useNavigate();
   const profileFn = useServerFn(getMyProfile);
   const { user } = useAuth();
@@ -94,6 +95,10 @@ function CheckoutPage() {
       toast.error("Please complete province, district, municipality and ward");
       return;
     }
+    if (!districts.includes(form.district) || !municipalities.includes(form.municipality) || !wards.includes(Number(form.ward))) {
+      toast.error("Please select a valid delivery location");
+      return;
+    }
     setBusy(true);
     const fullAddress = [form.tole, form.municipality, `Ward ${form.ward}`, form.district, form.province]
       .filter(Boolean).join(", ") + (form.address ? ` — ${form.address}` : "");
@@ -152,7 +157,7 @@ function CheckoutPage() {
 
           <div className="rounded-lg border border-border p-3">
             <div className="mb-2 text-sm font-semibold text-primary">Delivery Address (Nepal)</div>
-            <p className="mb-3 text-xs text-muted-foreground">Choose your Province first, then District, Municipality and finally your Area / Ward.</p>
+             <p className="mb-3 text-xs text-muted-foreground">Select Province, District, Municipality and Ward in order. Add your tole and landmark for accurate delivery.</p>
 
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
@@ -184,11 +189,11 @@ function CheckoutPage() {
                 </select>
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground">Area / Ward No.</label>
+                 <label className="text-xs font-medium text-muted-foreground">Ward number</label>
                 <select required disabled={!form.municipality} value={form.ward}
                   onChange={(e) => setForm({ ...form, ward: e.target.value })}
                   className={fieldClass}>
-                  <option value="">Select Ward</option>
+                   <option value="">Select Ward</option>
                   {wards.map((w) => (
                     <option key={w} value={String(w)}>{form.municipality} - Ward {w}</option>
                   ))}
@@ -196,8 +201,8 @@ function CheckoutPage() {
               </div>
 
               <div className="sm:col-span-2">
-                <label className="text-xs font-medium text-muted-foreground">Tole / Local Area</label>
-                <input maxLength={120} value={form.tole} onChange={(e) => setForm({ ...form, tole: e.target.value })}
+                 <label className="text-xs font-medium text-muted-foreground">Tole / Local Area</label>
+                 <input required maxLength={120} value={form.tole} onChange={(e) => setForm({ ...form, tole: e.target.value })}
                   className={fieldClass} placeholder="e.g. New Baneshwor, near temple" />
               </div>
               <div className="sm:col-span-2">
@@ -229,9 +234,16 @@ function CheckoutPage() {
           <div className="text-sm font-semibold">Your order</div>
           <ul className="mt-3 space-y-2 text-sm">
             {items.map((i) => (
-              <li key={i.id} className="flex justify-between gap-3">
-                <span className="truncate">{i.name}{i.size ? ` (EU ${i.size})` : ""} × {i.quantity}</span>
-                <span className="shrink-0">Rs. {(i.price * i.quantity).toLocaleString()}</span>
+               <li key={lineKey(i)} className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 border-b border-border pb-2 last:border-0">
+                 <div className="min-w-0"><span className="block break-words">{i.name}{i.size ? ` (EU ${i.size})` : ""}</span>
+                   <div className="mt-1 flex items-center gap-1">
+                     <Button type="button" variant="outline" size="icon" className="h-7 w-7" aria-label={`Decrease ${i.name} quantity`} onClick={() => i.quantity === 1 ? remove(lineKey(i)) : setQty(lineKey(i), i.quantity - 1)}><Minus className="h-3 w-3" /></Button>
+                     <span className="w-7 text-center">{i.quantity}</span>
+                     <Button type="button" variant="outline" size="icon" className="h-7 w-7" disabled={i.quantity >= 50} aria-label={`Increase ${i.name} quantity`} onClick={() => setQty(lineKey(i), i.quantity + 1)}><Plus className="h-3 w-3" /></Button>
+                     <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-destructive" aria-label={`Remove ${i.name}`} onClick={() => remove(lineKey(i))}><Trash2 className="h-3 w-3" /></Button>
+                   </div>
+                 </div>
+                 <span className="shrink-0">Rs. {(i.price * i.quantity).toLocaleString()}</span>
               </li>
             ))}
           </ul>

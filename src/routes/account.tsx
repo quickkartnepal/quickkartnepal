@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { LogOut, Package, User as UserIcon } from "lucide-react";
 
 export const Route = createFileRoute("/account")({
-  head: () => ({ meta: [{ title: "My Account — Quick Kart Nepal" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "My Account — Nextokart" }, { name: "robots", content: "noindex" }] }),
   component: Account,
 });
 

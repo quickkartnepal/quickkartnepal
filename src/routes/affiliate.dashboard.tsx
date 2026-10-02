@@ -19,7 +19,7 @@ import {
 } from "recharts";
 
 export const Route = createFileRoute("/affiliate/dashboard")({
-  head: () => ({ meta: [{ title: "Affiliate Dashboard — Quick Kart Nepal" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Affiliate Dashboard — Nextokart" }, { name: "robots", content: "noindex" }] }),
   component: AffiliateDashboard,
 });
 
@@ -56,7 +56,7 @@ function AffiliateDashboard() {
   if (loading || !user || isLoading) return <div className="mx-auto max-w-4xl px-4 py-16 text-muted-foreground">Loading…</div>;
   if (error || !data?.affiliate) return <div className="mx-auto max-w-4xl px-4 py-16 text-destructive">Failed to load: {(error as any)?.message ?? "unknown error"}</div>;
 
-  const origin = typeof window !== "undefined" ? window.location.origin : "https://quickkartnepal.com";
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://nextokart.lovable.app";
   const link = `${origin}/ref/${data.affiliate.username}`;
   const stats = data.stats!;
 
@@ -262,7 +262,8 @@ function PaymentRequestCard({ available, onSubmitted }: { available: number; onS
     setBusy(true);
     try {
       const amt = Number(amount);
-      if (!amt || amt < 1) throw new Error("Enter a valid amount");
+       if (!Number.isFinite(amt) || amt < 1 || amt > available) throw new Error(`Enter an amount from Rs. 1 to Rs. ${available.toLocaleString()}`);
+       if (!window.confirm(`Request withdrawal of Rs. ${amt.toLocaleString()}?`)) return;
       let qr_path: string | null = null;
       if (qrFile) {
         const { path, token } = await signFn({ data: { filename: qrFile.name } });
@@ -290,7 +291,7 @@ function PaymentRequestCard({ available, onSubmitted }: { available: number; onS
       <form onSubmit={submit} className="space-y-2">
         <input required maxLength={120} value={full_name} onChange={(e) => setFullName(e.target.value)}
           placeholder="Your full name" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
-        <input required type="number" min={1} value={amount} onChange={(e) => setAmount(e.target.value)}
+         <input required type="number" min={1} max={available} step="1" value={amount} onChange={(e) => setAmount(e.target.value)}
           placeholder="Amount to withdraw (Rs.)" className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
         <label className="flex cursor-pointer items-center justify-between gap-2 rounded-md border border-dashed border-input bg-background px-3 py-2 text-sm">
           <span className="inline-flex items-center gap-2 text-muted-foreground">
@@ -299,7 +300,7 @@ function PaymentRequestCard({ available, onSubmitted }: { available: number; onS
           <input type="file" accept="image/*" className="hidden"
             onChange={(e) => setQrFile(e.target.files?.[0] ?? null)} />
         </label>
-        <button disabled={busy} className="btn-gold w-full rounded-full py-2 text-sm font-semibold">
+         <button disabled={busy || available < 1} className="btn-gold w-full rounded-full py-2 text-sm font-semibold">
           {busy ? "Submitting…" : "Submit request"}
         </button>
       </form>

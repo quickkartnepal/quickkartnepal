@@ -120,7 +120,8 @@ export function lookupMunicipality(name: string): MunicipalityEntry | undefined 
 
 // Ward counts. Metropolitan / sub-metropolitan cities have more wards than
 // ordinary municipalities and rural municipalities, so the bigger cities are
-// listed explicitly and everything else falls back to a safe default.
+// listed explicitly. Unknown ward counts expose the full selectable range
+// rather than silently excluding valid higher-numbered wards.
 const WARD_COUNTS: Record<string, number> = {
   Kathmandu: 32, Pokhara: 33, Lalitpur: 29, "Bharatpur": 29, Biratnagar: 19,
   Birgunj: 32, Janakpur: 25, Ghorahi: 19, Hetauda: 19, Dhangadhi: 19,
@@ -129,7 +130,8 @@ const WARD_COUNTS: Record<string, number> = {
   Birendranagar: 16, Tikapur: 9, Damak: 10, Mechinagar: 15, Birtamod: 10,
   Bhimdatta: 19, Gulariya: 12, Kirtipur: 10, "Madhyapur Thimi": 9,
   Lahan: 24, Rajbiraj: 16, Siddharthanagar: 13, Tansen: 14, Waling: 14,
-  Banepa: 14, Dhulikhel: 12, Bidur: 13, Panauti: 12, Kohalpur: 15,
+   Banepa: 14, Dhulikhel: 12, Bidur: 13, Panauti: 12, Kohalpur: 15,
+   "Siddharthanagar (Bhairahawa)": 13,
 };
 
 export const wardsOf = (
@@ -138,6 +140,6 @@ export const wardsOf = (
   municipality: string,
 ): number[] => {
   if (!municipality) return [];
-  const count = WARD_COUNTS[municipality] ?? 12;
+   const count = WARD_COUNTS[municipality] ?? 35;
   return Array.from({ length: count }, (_, i) => i + 1);
 };
