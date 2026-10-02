@@ -57,7 +57,7 @@ function About() {
           <li><strong>Cash on Delivery</strong> available all over Nepal — pay only when you receive your order.</li>
           <li><strong>Nationwide delivery</strong>, fast and reliable, no matter where you live.</li>
           <li><strong>Hand-picked, authentic products</strong> — we don&apos;t list what we wouldn&apos;t buy ourselves.</li>
-          <li><strong>Real human support</strong> on WhatsApp before, during, and after your order.</li>
+          <li><strong>Real human support</strong> by email before, during, and after your order.</li>
           <li><strong>Easy returns and refunds</strong> if your product arrives damaged or wrong.</li>
         </ul>
 

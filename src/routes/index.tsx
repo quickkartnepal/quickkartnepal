@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/site/ProductCard";
-import banner from "@/assets/banner.png";
+import banner from "@/assets/nextokart-banner.png.asset.json";
 import { Truck, BadgeCheck, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -21,9 +21,9 @@ export const Route = createFileRoute("/")({
 });
 
 const fallbackSlides = [
-  { title: "Authentic Nepali Heritage", subtitle: "Curated picks delivered all over Nepal", image_url: banner, link_url: null as string | null },
-  { title: "Cash on Delivery", subtitle: "Pay only after you receive your order", image_url: banner, link_url: null },
-  { title: "Trending in Nepal", subtitle: "Hand-picked products everyone loves", image_url: banner, link_url: null },
+  { title: "Shoes & Electronics", subtitle: "Curated picks delivered all over Nepal", image_url: banner.url, link_url: null as string | null },
+  { title: "Cash on Delivery", subtitle: "Pay only after you receive your order", image_url: banner.url, link_url: null },
+  { title: "Explore Nextokart", subtitle: "Hand-picked products everyone loves", image_url: banner.url, link_url: null },
 ];
 
 function useProducts() {

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Mail, MessageCircle, Music2 } from "lucide-react";
+import { Instagram, Mail, Music2 } from "lucide-react";
 
 export function Footer() {
   return (
@@ -34,11 +34,6 @@ export function Footer() {
         <div>
           <div className="mb-3 text-sm font-semibold">Get in touch</div>
           <ul className="space-y-2 text-sm">
-            <li>
-              <a href="https://wa.me/9779802649094" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-primary">
-                <MessageCircle className="h-4 w-4" /> <span>WhatsApp: 9802649094</span>
-              </a>
-            </li>
             <li>
               <a href="mailto:supportnexto@gmail.com" className="inline-flex items-center gap-2 hover:text-primary">
                 <Mail className="h-4 w-4" /> <span>supportnexto@gmail.com</span>
