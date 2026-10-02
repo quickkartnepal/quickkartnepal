@@ -185,12 +185,10 @@ export const requestPayment = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    const aff = await getOrCreateAffiliate(context.userId);
-    const { error } = await supabaseAdmin.from("affiliate_payment_requests").insert({
-      affiliate_id: aff.id,
-      full_name: data.full_name,
-      amount: data.amount,
-      qr_path: data.qr_path ?? null,
+    const { error } = await context.supabase.rpc("request_affiliate_payment", {
+      _full_name: data.full_name,
+      _amount: data.amount,
+      _qr_path: data.qr_path ?? null,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
