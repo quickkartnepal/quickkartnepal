@@ -3,8 +3,8 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/return-policy")({
   head: () => ({
     meta: [
-      { title: "Return & Refund Policy — Quick Kart Nepal" },
-      { name: "description", content: "Clear return & refund policy for Quick Kart Nepal Cash on Delivery orders." },
+      { title: "Return & Refund Policy — Nextokart" },
+      { name: "description", content: "Clear return & refund policy for Nextokart Cash on Delivery orders." },
     ],
   }),
   component: Policy,
@@ -64,7 +64,7 @@ function Policy() {
         </ol>
 
         <p className="mt-6 rounded-xl border border-accent/30 bg-accent/10 p-4 text-sm">
-          Need help with an order? Contact us anytime on WhatsApp <strong>9802649094</strong> or email <a className="text-primary underline" href="mailto:infoquickkartnepal@gmail.com">infoquickkartnepal@gmail.com</a>.
+          Need help with an order? Contact us anytime on WhatsApp <strong>9802649094</strong> or email <a className="text-primary underline" href="mailto:supportnexto@gmail.com">supportnexto@gmail.com</a>.
         </p>
       </div>
     </div>

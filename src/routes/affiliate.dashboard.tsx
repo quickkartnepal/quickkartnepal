@@ -19,7 +19,7 @@ import {
 } from "recharts";
 
 export const Route = createFileRoute("/affiliate/dashboard")({
-  head: () => ({ meta: [{ title: "Affiliate Dashboard — Quick Kart Nepal" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Affiliate Dashboard — Nextokart" }, { name: "robots", content: "noindex" }] }),
   component: AffiliateDashboard,
 });
 

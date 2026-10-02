@@ -21,9 +21,9 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-3 sm:px-4">
         <Link to="/" className="flex items-center gap-2 sm:gap-3">
-          <img src={logo} alt="Quick Kart Nepal" className="h-10 w-10 rounded-full ring-2 ring-primary/20 sm:h-12 sm:w-12" />
+          <img src={logo} alt="Nextokart" className="h-10 w-10 rounded-full ring-2 ring-primary/20 sm:h-12 sm:w-12" />
           <div className="leading-tight">
-            <div className="font-display text-base text-primary sm:text-xl">Quick Kart Nepal</div>
+            <div className="font-display text-base text-primary sm:text-xl">Nextokart</div>
             <div className="hidden text-[11px] uppercase tracking-widest text-muted-foreground sm:block">Founded by Suraj &amp; Romeo</div>
           </div>
         </Link>

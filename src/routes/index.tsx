@@ -9,9 +9,9 @@ import { Truck, BadgeCheck, ShieldCheck, ChevronLeft, ChevronRight } from "lucid
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Quick Kart Nepal — Authentic Nepali Shopping with COD" },
+      { title: "Nextokart — Authentic Nepali Shopping with COD" },
       { name: "description", content: "Shop shoes and electronics with Cash on Delivery all over Nepal. Trending picks updated daily." },
-      { property: "og:title", content: "Quick Kart Nepal — Shoes & Electronics with COD" },
+      { property: "og:title", content: "Nextokart — Shoes & Electronics with COD" },
       { property: "og:description", content: "Shop shoes and electronics with Cash on Delivery all over Nepal." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -59,7 +59,7 @@ function useBanners() {
 function HeroSlider() {
   const { data: banners } = useBanners();
   const slides = banners && banners.length > 0
-    ? banners.map((b: any) => ({ title: b.title || "Quick Kart Nepal", subtitle: "Tap to explore", image_url: b.image_url, link_url: b.link_url }))
+    ? banners.map((b: any) => ({ title: b.title || "Nextokart", subtitle: "Tap to explore", image_url: b.image_url, link_url: b.link_url }))
     : fallbackSlides;
   const [i, setI] = useState(0);
   useEffect(() => {
@@ -75,7 +75,7 @@ function HeroSlider() {
       <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent" />
       <div className="relative mx-auto flex h-full max-w-7xl items-center px-4">
         <div className="max-w-xl">
-          <span className="inline-block rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-accent">Quick Kart Nepal</span>
+          <span className="inline-block rounded-full bg-accent/15 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-accent">Nextokart</span>
           <h1 className="mt-3 text-3xl font-bold leading-tight text-primary sm:text-4xl md:text-6xl">{s.title}</h1>
           <p className="mt-3 text-sm text-foreground/80 sm:text-base md:text-lg">{s.subtitle}</p>
           <a href="#products" className="btn-gold mt-5 inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold sm:px-6 sm:py-3">Shop now</a>
@@ -217,7 +217,7 @@ function Home() {
         <div className="mx-auto max-w-7xl px-4 py-10 text-center sm:py-12">
           <h2 className="font-display text-2xl text-primary sm:text-3xl">Discover the spirit of Nepal</h2>
           <p className="mx-auto mt-2 max-w-2xl text-sm text-muted-foreground">
-            From the foothills of the Himalayas to your doorstep — Quick Kart Nepal brings you the warmth of Nepali craftsmanship with the convenience of Cash on Delivery.
+            From the foothills of the Himalayas to your doorstep — Nextokart brings you the warmth of Nepali craftsmanship with the convenience of Cash on Delivery.
           </p>
           <Link to="/about" className="mt-5 inline-block rounded-full border border-primary px-6 py-2.5 text-sm font-semibold text-primary hover:bg-primary hover:text-primary-foreground">
             Our Story

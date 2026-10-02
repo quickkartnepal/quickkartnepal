@@ -11,7 +11,7 @@ import { BadgeCheck, Tag } from "lucide-react";
 import { PROVINCES, districtsOf, municipalitiesOf, wardsOf } from "@/lib/nepal-address";
 
 export const Route = createFileRoute("/checkout")({
-  head: () => ({ meta: [{ title: "Checkout — Quick Kart Nepal" }] }),
+  head: () => ({ meta: [{ title: "Checkout — Nextokart" }] }),
   component: CheckoutPage,
 });
 

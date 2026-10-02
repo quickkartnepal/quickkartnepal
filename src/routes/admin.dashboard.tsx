@@ -24,7 +24,7 @@ import { listAffiliatesAdmin, listPaymentRequestsAdmin, updatePaymentRequestAdmi
 type Tab = "overview" | "products" | "categories" | "orders" | "banners" | "promos" | "affiliates" | "payouts" | "settings";
 
 export const Route = createFileRoute("/admin/dashboard")({
-  head: () => ({ meta: [{ title: "Admin Dashboard — Quick Kart Nepal" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Admin Dashboard — Nextokart" }, { name: "robots", content: "noindex" }] }),
   component: Dashboard,
 });
 

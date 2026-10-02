@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Login / Sign up — Quick Kart Nepal" }] }),
+  head: () => ({ meta: [{ title: "Login / Sign up — Nextokart" }] }),
   component: AuthPage,
 });
 

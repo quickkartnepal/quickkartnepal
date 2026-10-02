@@ -3,8 +3,8 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About — Quick Kart Nepal" },
-      { name: "description", content: "Quick Kart Nepal was founded by Suraj & Romeo to bring authentic Nepali products to every doorstep in Nepal with Cash on Delivery." },
+      { title: "About — Nextokart" },
+      { name: "description", content: "Nextokart was founded by Suraj & Romeo to bring authentic Nepali products to every doorstep in Nepal with Cash on Delivery." },
     ],
   }),
   component: About,
@@ -16,12 +16,12 @@ function About() {
       <div className="mb-6 rounded-lg bg-secondary/50 px-4 py-2 text-center text-xs font-medium text-muted-foreground">
         Website Developed by Suraj Bishwokarma
       </div>
-      <h1 className="font-display text-4xl text-primary">About Quick Kart Nepal</h1>
+      <h1 className="font-display text-4xl text-primary">About Nextokart</h1>
       <p className="mt-3 text-sm uppercase tracking-widest text-accent">Founded by Suraj &amp; Romeo</p>
 
       <div className="prose prose-stone mt-6 max-w-none space-y-4 text-foreground/85">
         <p>
-          Quick Kart Nepal is a homegrown online shopping destination dedicated to making authentic Nepali
+          Nextokart is a homegrown online shopping destination dedicated to making authentic Nepali
           products available across the country — with the trust and convenience of Cash on Delivery.
           We believe online shopping in Nepal should be simple, honest, and built for Nepali shoppers.
         </p>
@@ -41,9 +41,9 @@ function About() {
 
         <h2 className="mt-6 font-display text-2xl text-primary">Our Story</h2>
         <p>
-          Quick Kart Nepal was founded by <strong>Suraj</strong> and <strong>Romeo</strong> — two young
+          Nextokart was founded by <strong>Suraj</strong> and <strong>Romeo</strong> — two young
           Nepali entrepreneurs who saw how hard it still was for shoppers outside Kathmandu to access the
-          everyday products they wanted, with prices and trust they could count on. We started Quick Kart
+          everyday products they wanted, with prices and trust they could count on. We started Nextokart
           to fix that: a single trusted store that delivers across all 77 districts, with Cash on Delivery
           so you only pay once you have the product in your hand.
         </p>
@@ -63,7 +63,7 @@ function About() {
 
         <h2 className="mt-6 font-display text-2xl text-primary">Built in Nepal, for Nepal</h2>
         <p>
-          Quick Kart Nepal is proudly designed and operated from Nepal. Our team grew up here, shops here,
+          Nextokart is proudly designed and operated from Nepal. Our team grew up here, shops here,
           and ships here — and we&apos;re building the kind of online store we always wished existed.
         </p>
 

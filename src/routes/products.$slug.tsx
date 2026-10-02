@@ -30,7 +30,7 @@ function formatDescription(text: string | null | undefined): string[] {
 export const Route = createFileRoute("/products/$slug")({
   head: ({ params }) => ({
     meta: [
-      { title: `${params.slug} — Quick Kart Nepal` },
+      { title: `${params.slug} — Nextokart` },
       { name: "description", content: "Buy authentic Nepali products with Cash on Delivery all over Nepal." },
     ],
   }),

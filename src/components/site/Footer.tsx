@@ -6,7 +6,7 @@ export function Footer() {
     <footer className="mt-20 border-t border-border bg-secondary/40">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:grid-cols-4">
         <div>
-          <div className="font-display text-2xl text-primary">Quick Kart Nepal</div>
+          <div className="font-display text-2xl text-primary">Nextokart</div>
           <p className="mt-2 text-sm text-muted-foreground">
             Authentic Nepali products, delivered all over Nepal with Cash on Delivery.
           </p>
@@ -40,18 +40,18 @@ export function Footer() {
               </a>
             </li>
             <li>
-              <a href="mailto:infoquickkartnepal@gmail.com" className="inline-flex items-center gap-2 hover:text-primary">
-                <Mail className="h-4 w-4" /> <span>infoquickkartnepal@gmail.com</span>
+              <a href="mailto:supportnexto@gmail.com" className="inline-flex items-center gap-2 hover:text-primary">
+                <Mail className="h-4 w-4" /> <span>supportnexto@gmail.com</span>
               </a>
             </li>
             <li>
-              <a href="https://instagram.com/quickkart_nepal" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-primary">
-                <Instagram className="h-4 w-4" /> <span>@quickkart_nepal</span>
+              <a href="https://www.instagram.com/nextokart/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-primary">
+                <Instagram className="h-4 w-4" /> <span>@nextokart</span>
               </a>
             </li>
             <li>
-              <a href="https://www.tiktok.com/@quickkart_nepal" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-primary">
-                <Music2 className="h-4 w-4" /> <span>@quickkart_nepal</span>
+              <a href="https://www.tiktok.com/@nextokart" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-primary">
+                <Music2 className="h-4 w-4" /> <span>@nextokart</span>
               </a>
             </li>
           </ul>
@@ -59,7 +59,7 @@ export function Footer() {
       </div>
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-muted-foreground md:flex-row">
-          <div>© {new Date().getFullYear()} Quick Kart Nepal. All rights reserved. Website developed by Suraj Bishwokarma.</div>
+          <div>© {new Date().getFullYear()} Nextokart. All rights reserved. Website developed by Suraj Bishwokarma.</div>
           <Link to="/admin/login" className="opacity-60 transition hover:opacity-100 hover:text-primary">
             Admin
           </Link>

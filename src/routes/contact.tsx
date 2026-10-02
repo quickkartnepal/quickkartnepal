@@ -4,8 +4,8 @@ import { Instagram, Mail, MessageCircle, Music2 } from "lucide-react";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact — Quick Kart Nepal" },
-      { name: "description", content: "Get in touch with Quick Kart Nepal via WhatsApp, email, Instagram, or TikTok." },
+      { title: "Contact — Nextokart" },
+      { name: "description", content: "Get in touch with Nextokart via WhatsApp, email, Instagram, or TikTok." },
     ],
   }),
   component: Contact,
@@ -13,9 +13,9 @@ export const Route = createFileRoute("/contact")({
 
 const items = [
   { icon: MessageCircle, label: "WhatsApp", value: "9802649094", href: "https://wa.me/9779802649094" },
-  { icon: Mail, label: "Email", value: "infoquickkartnepal@gmail.com", href: "mailto:infoquickkartnepal@gmail.com" },
-  { icon: Instagram, label: "Instagram", value: "@quickkart_nepal", href: "https://instagram.com/quickkart_nepal" },
-  { icon: Music2, label: "TikTok", value: "@quickkart_nepal", href: "https://www.tiktok.com/@quickkart_nepal" },
+  { icon: Mail, label: "Email", value: "supportnexto@gmail.com", href: "mailto:supportnexto@gmail.com" },
+  { icon: Instagram, label: "Instagram", value: "@nextokart", href: "https://www.instagram.com/nextokart/" },
+  { icon: Music2, label: "TikTok", value: "@nextokart", href: "https://www.tiktok.com/@nextokart" },
 ];
 
 function Contact() {
