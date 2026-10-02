@@ -588,6 +588,10 @@ export type Database = {
         Args: { _user_agent?: string; _username: string }
         Returns: boolean
       }
+      request_affiliate_payment: {
+        Args: { _amount: number; _full_name: string; _qr_path?: string }
+        Returns: string
+      }
       validate_checkout_promo: {
         Args: { _code: string; _subtotal: number }
         Returns: Json

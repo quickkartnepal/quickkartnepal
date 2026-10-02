@@ -8,6 +8,13 @@
       "when": 1790355393925,
       "tag": "0000_shoe_sizes_and_click_tracking",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790904721259,
+      "tag": "0001_guard_affiliate_withdrawals",
+      "breakpoints": true
     }
   ]
 }
