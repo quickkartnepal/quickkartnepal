@@ -10,7 +10,7 @@ import {
   deletePromo,
   deleteProduct,
   getSignedDownload,
-  listOrdersAdmin, resetAllDataAdmin,
+  listOrdersAdmin, resetAllDataAdmin, resetAffiliatesAdmin,
   updateOrderStatus,
   upsertBanner,
   upsertProduct,
@@ -679,14 +679,36 @@ function SettingsTab() {
 
 // ---------------- Affiliates ----------------
 function AffiliatesTab() {
+  const qc = useQueryClient();
   const fetchFn = useServerFn(listAffiliatesAdmin);
   const detailsFn = useServerFn(getAffiliateDetailsAdmin);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const { data, isLoading } = useQuery({ queryKey: ["admin-affiliates"], queryFn: () => fetchFn() });
   const { data: details, isLoading: loadingDetails, error: detailsError } = useQuery({ queryKey: ["admin-affiliate-detail", selectedId], queryFn: () => detailsFn({ data: { id: selectedId ?? "" } }), enabled: !!selectedId });
+  const resetFn = useServerFn(resetAffiliatesAdmin);
+  const resetMut = useMutation({
+    mutationFn: () => resetFn({ data: { confirm: "RESET" } }),
+    onSuccess: () => { toast.success("All affiliates and their data deleted"); setSelectedId(null); qc.invalidateQueries(); },
+    onError: (e: any) => toast.error(e?.message ?? "Reset failed"),
+  });
+  const onReset = () => {
+    if (!window.confirm("This will permanently delete ALL affiliates and ALL their clicks, commissions and payout requests. Continue?")) return;
+    const typed = window.prompt('Type RESET to confirm');
+    if (typed !== "RESET") { toast.error("Reset cancelled"); return; }
+    resetMut.mutate();
+  };
   if (isLoading || !data) return <div className="text-sm text-muted-foreground">Loading…</div>;
   if (data.affiliates.length === 0)
-    return <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">No affiliates yet.</div>;
+    return (
+      <div className="space-y-4">
+        <div className="flex justify-end">
+          <Button variant="destructive" onClick={onReset} disabled={resetMut.isPending}>
+            <Trash2 className="h-4 w-4" /> {resetMut.isPending ? "Resetting…" : "Reset all affiliates"}
+          </Button>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">No affiliates yet.</div>
+      </div>
+    );
   return (
     selectedId ? <div className="space-y-4">
       <Button variant="outline" onClick={() => setSelectedId(null)}>← All affiliates</Button>
@@ -705,6 +727,12 @@ function AffiliatesTab() {
         <section><h3 className="mb-2 font-semibold">Recent clicks</h3><p className="text-sm text-muted-foreground">{details.recent_clicks.length ? details.recent_clicks.map((click) => new Date(click.created_at).toLocaleString("en-NP", { timeZone: "Asia/Kathmandu" }) + " NPT").join(" · ") : "No clicks yet."}</p></section>
       </>}
     </div> :
+    <div className="space-y-3">
+    <div className="flex justify-end">
+      <Button variant="destructive" onClick={onReset} disabled={resetMut.isPending}>
+        <Trash2 className="h-4 w-4" /> {resetMut.isPending ? "Resetting…" : "Reset all affiliates"}
+      </Button>
+    </div>
     <div className="overflow-x-auto rounded-xl border border-border bg-card">
       <table className="w-full text-sm">
         <thead className="bg-secondary/60 text-left text-xs uppercase tracking-wider text-muted-foreground">
@@ -735,6 +763,7 @@ function AffiliatesTab() {
           ))}
         </tbody>
       </table>
+    </div>
     </div>
   );
 }
