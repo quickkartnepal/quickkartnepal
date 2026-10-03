@@ -120,8 +120,7 @@ export function lookupMunicipality(name: string): MunicipalityEntry | undefined 
 
 // Ward counts. Metropolitan / sub-metropolitan cities have more wards than
 // ordinary municipalities and rural municipalities, so the bigger cities are
-// listed explicitly. Unknown ward counts expose the full selectable range
-// rather than silently excluding valid higher-numbered wards.
+// listed explicitly. Other municipalities / rural municipalities default to 9 wards.
 const WARD_COUNTS: Record<string, number> = {
   Kathmandu: 32, Pokhara: 33, Lalitpur: 29, "Bharatpur": 29, Biratnagar: 19,
   Birgunj: 32, Janakpur: 25, Ghorahi: 19, Hetauda: 19, Dhangadhi: 19,
@@ -132,6 +131,18 @@ const WARD_COUNTS: Record<string, number> = {
   Lahan: 24, Rajbiraj: 16, Siddharthanagar: 13, Tansen: 14, Waling: 14,
    Banepa: 14, Dhulikhel: 12, Bidur: 13, Panauti: 12, Kohalpur: 15,
    "Siddharthanagar (Bhairahawa)": 13,
+  Tilottama: 17, Budhanilkantha: 13, Tokha: 11, Chandragiri: 15, Tarakeshwar: 11,
+  Gokarneshwar: 9, "Kageshwari Manohara": 9, Nagarjun: 10, Dakshinkali: 9, Shankharapur: 9,
+  Godawari: 14, Changunarayan: 9, Suryabinayak: 10, Inaruwa: 10, Bhadrapur: 10, Ilam: 12,
+  Kawasoti: 17, Gaindakot: 18, Byas: 14, Ratnanagar: 16, Khairahani: 13, Rapti: 13,
+  Mirchaiya: 12, Siraha: 22, Jaleshwar: 12, Gaur: 9, Malangwa: 12, Lamahi: 9, Kapilvastu: 12,
+  Banganga: 11, Bardaghat: 16, Ramgram: 18, Sunwal: 13, Devdaha: 12, Sainamaina: 11,
+  Rajapur: 10, Beni: 10, Kushma: 14, Baglung: 14, Gorkha: 14, Besisahar: 11, Putalibazar: 14,
+  "Dipayal Silgadhi": 9, Amargadhi: 11, Belbari: 11, Urlabari: 9, "Sundar Haraicha": 12,
+  Rangeli: 9, Duhabi: 12, Triyuga: 16, Chandrapur: 10, Simraungadh: 11, Nijgadh: 13,
+  Kolhabi: 11, Manthali: 14, Kamalamai: 14, Bhimeshwar: 9, "Chautara Sangachok Gadhi": 14,
+  Melamchi: 13, Nilkantha: 14, Khandbari: 11, Phidim: 14, Phungling: 11, Myanglung: 10,
+  Dhankuta: 10,
 };
 
 export const wardsOf = (
@@ -140,6 +151,6 @@ export const wardsOf = (
   municipality: string,
 ): number[] => {
   if (!municipality) return [];
-   const count = WARD_COUNTS[municipality] ?? 35;
+   const count = WARD_COUNTS[municipality] ?? 9;
   return Array.from({ length: count }, (_, i) => i + 1);
 };
