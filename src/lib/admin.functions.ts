@@ -439,3 +439,17 @@ export const resetAllDataAdmin = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+// --- Reset all affiliates (admin only) --------------------------
+export const resetAffiliatesAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ confirm: z.literal("RESET") }).parse(input))
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const all = "00000000-0000-0000-0000-000000000000";
+    for (const t of ["affiliate_payment_requests", "affiliate_orders", "affiliate_clicks", "affiliates"] as const) {
+      const { error } = await supabaseAdmin.from(t).delete().neq("id", all);
+      if (error) throw new Error(`${t}: ${error.message}`);
+    }
+    return { ok: true };
+  });
