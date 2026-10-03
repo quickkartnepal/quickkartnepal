@@ -727,6 +727,12 @@ function AffiliatesTab() {
         <section><h3 className="mb-2 font-semibold">Recent clicks</h3><p className="text-sm text-muted-foreground">{details.recent_clicks.length ? details.recent_clicks.map((click) => new Date(click.created_at).toLocaleString("en-NP", { timeZone: "Asia/Kathmandu" }) + " NPT").join(" · ") : "No clicks yet."}</p></section>
       </>}
     </div> :
+    <div className="space-y-3">
+    <div className="flex justify-end">
+      <Button variant="destructive" onClick={onReset} disabled={resetMut.isPending}>
+        <Trash2 className="h-4 w-4" /> {resetMut.isPending ? "Resetting…" : "Reset all affiliates"}
+      </Button>
+    </div>
     <div className="overflow-x-auto rounded-xl border border-border bg-card">
       <table className="w-full text-sm">
         <thead className="bg-secondary/60 text-left text-xs uppercase tracking-wider text-muted-foreground">
