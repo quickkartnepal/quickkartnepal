@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Instagram, Mail, Music2 } from "lucide-react";
+import { Instagram, Mail, Music2, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -13,7 +13,8 @@ export const Route = createFileRoute("/contact")({
 
 const items = [
   { icon: Mail, label: "Email", value: "supportnexto@gmail.com", href: "mailto:supportnexto@gmail.com" },
-  { icon: Instagram, label: "Instagram", value: "@nextokart", href: "https://www.instagram.com/nextokart/" },
+  { icon: MessageCircle, label: "WhatsApp", value: "9802649094", href: "https://wa.me/9779802649094" },
+  { icon: Instagram, label: "Instagram", value: "@nextokart", href: "https://instagram.com/nextokart" },
   { icon: Music2, label: "TikTok", value: "@nextokart", href: "https://www.tiktok.com/@nextokart" },
 ];
 
