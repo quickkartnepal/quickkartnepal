@@ -10,7 +10,7 @@ import {
   deletePromo,
   deleteProduct,
   getSignedDownload,
-  listOrdersAdmin,
+  listOrdersAdmin, resetAllDataAdmin,
   updateOrderStatus,
   upsertBanner,
   upsertProduct,
