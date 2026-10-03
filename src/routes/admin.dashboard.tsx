@@ -387,12 +387,36 @@ function OrdersTab() {
     onError: (e: any) => toast.error(e?.message ?? "Failed"),
   });
 
+  const [q, setQ] = useState("");
+  const reset = useServerFn(resetAllDataAdmin);
+  const resetMut = useMutation({
+    mutationFn: () => reset({ data: { confirm: "RESET" } }),
+    onSuccess: () => { toast.success("All orders and affiliate data reset to zero"); qc.invalidateQueries(); },
+    onError: (e: any) => toast.error(e?.message ?? "Reset failed"),
+  });
+  const onReset = () => {
+    if (!window.confirm("This will permanently delete ALL orders and ALL affiliate clicks, commissions and payout requests. Everything becomes zero. Continue?")) return;
+    const typed = window.prompt('Type RESET to confirm');
+    if (typed !== "RESET") { toast.error("Reset cancelled"); return; }
+    resetMut.mutate();
+  };
+
   if (isLoading) return <div className="text-sm text-muted-foreground">Loading…</div>;
-  const orders = data?.orders ?? [];
-  if (orders.length === 0) return <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">No orders yet.</div>;
+  const all = data?.orders ?? [];
+  const term = q.trim().toLowerCase();
+  const orders = term ? all.filter((o: any) => [o.order_number, o.full_name, o.phone].some((v) => String(v ?? "").toLowerCase().includes(term))) : all;
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search order number (e.g. QKN-1A2B3C4D), name or phone"
+          className="min-w-0 flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm" />
+        <Button variant="destructive" onClick={onReset} disabled={resetMut.isPending}>
+          <Trash2 className="h-4 w-4" /> {resetMut.isPending ? "Resetting…" : "Reset all data"}
+        </Button>
+      </div>
+      <div className="text-xs text-muted-foreground">{orders.length} of {all.length} orders</div>
+      {orders.length === 0 && <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">{term ? "No order found with that number." : "No orders yet."}</div>}
       {orders.map((o: any) => (
         <div key={o.id} className="rounded-xl border border-border bg-card p-4">
           <div className="flex flex-wrap items-start justify-between gap-2">
@@ -415,6 +439,9 @@ function OrdersTab() {
             <div><div className="text-xs uppercase text-muted-foreground">Customer</div><div className="font-medium">{o.full_name}</div></div>
             <div><div className="text-xs uppercase text-muted-foreground">Phone</div><div className="font-medium"><a href={`tel:${o.phone}`} className="text-primary">{o.phone}</a></div></div>
             <div><div className="text-xs uppercase text-muted-foreground">Payment</div><div className="font-medium">{o.payment_method}</div></div>
+            <div><div className="text-xs uppercase text-muted-foreground">Status</div><div className="font-medium capitalize">{o.status}</div></div>
+            <div><div className="text-xs uppercase text-muted-foreground">Account</div><div className="font-medium">{o.user_id ? "Registered customer" : "Guest"}</div></div>
+            <div><div className="text-xs uppercase text-muted-foreground">Affiliate</div><div className="font-medium">{o.affiliate_code ? `@${o.affiliate_code}` : "Direct (no affiliate)"}</div></div>
              <div className="sm:col-span-3"><div className="text-xs uppercase text-muted-foreground">Delivery location</div>
                <div className="font-medium">{[o.province, o.district, o.municipality, o.ward ? `Ward ${o.ward}` : null, o.tole].filter(Boolean).join(" · ") || "Location not provided"}</div>
                <div className="mt-1 break-words">{o.address}</div>
