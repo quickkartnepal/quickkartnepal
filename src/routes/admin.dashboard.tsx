@@ -764,6 +764,7 @@ function AffiliatesTab() {
         </tbody>
       </table>
     </div>
+    </div>
   );
 }
 
