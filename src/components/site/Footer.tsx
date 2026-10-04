@@ -40,17 +40,17 @@ export function Footer() {
               </a>
             </li>
             <li>
-              <a href="https://wa.me/9779802649094" className="inline-flex items-center gap-2 hover:text-primary">
+              <a target="_blank" rel="noopener noreferrer" href="https://api.whatsapp.com/send?phone=9779802649094" className="inline-flex items-center gap-2 hover:text-primary">
                 <MessageCircle className="h-4 w-4" /> <span>WhatsApp 9802649094</span>
               </a>
             </li>
             <li>
-              <a href="https://www.instagram.com/nextokart/" className="inline-flex items-center gap-2 hover:text-primary">
+              <a target="_blank" rel="noopener noreferrer" href="https://www.instagram.com/nextokart/" className="inline-flex items-center gap-2 hover:text-primary">
                 <Instagram className="h-4 w-4" /> <span>@nextokart</span>
               </a>
             </li>
             <li>
-              <a href="https://www.tiktok.com/@nextokart" className="inline-flex items-center gap-2 hover:text-primary">
+              <a target="_blank" rel="noopener noreferrer" href="https://www.tiktok.com/@nextokart" className="inline-flex items-center gap-2 hover:text-primary">
                 <Music2 className="h-4 w-4" /> <span>@nextokart</span>
               </a>
             </li>

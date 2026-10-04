@@ -13,7 +13,7 @@ export const Route = createFileRoute("/contact")({
 
 const items = [
   { icon: Mail, label: "Email", value: "supportnexto@gmail.com", href: "mailto:supportnexto@gmail.com" },
-  { icon: MessageCircle, label: "WhatsApp", value: "9802649094", href: "https://wa.me/9779802649094" },
+  { icon: MessageCircle, label: "WhatsApp", value: "9802649094", href: "https://api.whatsapp.com/send?phone=9779802649094" },
   { icon: Instagram, label: "Instagram", value: "@nextokart", href: "https://www.instagram.com/nextokart/" },
   { icon: Music2, label: "TikTok", value: "@nextokart", href: "https://www.tiktok.com/@nextokart" },
 ];
@@ -25,7 +25,7 @@ function Contact() {
       <p className="mt-2 text-sm text-muted-foreground">We're here to help — reach out anytime.</p>
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
         {items.map((it, i) => (
-          <a key={i} href={it.href}
+          <a key={i} href={it.href} target={it.href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer"
             className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition hover:border-primary">
             <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
               <it.icon className="h-5 w-5" />
