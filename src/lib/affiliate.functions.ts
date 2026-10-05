@@ -13,7 +13,7 @@ async function getOrCreateAffiliate(supabase: any) {
 export const signupAffiliate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     const aff = await getOrCreateAffiliate(context.supabase);
     return { id: aff.id, username: aff.username };
   });
@@ -31,7 +31,7 @@ async function assertAdminLocal(supabase: any, userId: string) {
 export const getMyAffiliate = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     const aff = await getOrCreateAffiliate(context.supabase);
 
     const [{ count: clicks }, { data: aoRows }, { data: payReqs }] = await Promise.all([
@@ -138,7 +138,7 @@ export const createQrSignedUpload = createServerFn({ method: "POST" })
     z.object({ filename: z.string().min(1).max(200) }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     const aff = await getOrCreateAffiliate(context.supabase);
     const safe = data.filename.replace(/[^a-zA-Z0-9._-]/g, "_");
     const path = `${aff.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safe}`;
@@ -161,7 +161,7 @@ export const requestPayment = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     const { error } = await context.supabase.rpc("request_affiliate_payment", {
       _full_name: data.full_name,
       _amount: data.amount,
@@ -175,7 +175,7 @@ export const requestPayment = createServerFn({ method: "POST" })
 export const listAffiliatesAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     await assertAdminLocal(context.supabase, context.userId);
 
     const { data: affs } = await supabaseAdmin
@@ -215,7 +215,7 @@ export const getAffiliateDetailsAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     await assertAdminLocal(context.supabase, context.userId);
     const { data: affiliate, error } = await supabaseAdmin.from("affiliates").select("*").eq("id", data.id).single();
     if (error) throw new Error(error.message);
@@ -244,7 +244,7 @@ export const getAffiliateDetailsAdmin = createServerFn({ method: "GET" })
 export const listPaymentRequestsAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     await assertAdminLocal(context.supabase, context.userId);
 
     const { data: reqs } = await supabaseAdmin
@@ -287,7 +287,7 @@ export const updatePaymentRequestAdmin = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     await assertAdminLocal(context.supabase, context.userId);
     const { error } = await supabaseAdmin
       .from("affiliate_payment_requests")
