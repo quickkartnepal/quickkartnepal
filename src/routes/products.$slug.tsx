@@ -7,7 +7,6 @@ import { useAuth } from "@/lib/auth";
 import { Star, Truck, BadgeCheck, ShoppingCart, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
-import { submitReview } from "@/lib/shop.functions";
 
 // Product descriptions are often pasted as one long run-on line with emoji
 // markers. Break them into readable lines: first on real line breaks, then
@@ -42,7 +41,6 @@ function ProductPage() {
   const nav = useNavigate();
   const { add } = useCart();
   const { user } = useAuth();
-  const submit = useServerFn(submitReview);
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", slug],
@@ -111,7 +109,8 @@ function ProductPage() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await submit({ data: { product_id: product.id, name: rName, rating: rRating, comment: rComment, user_id: user?.id ?? null } });
+      const { error: rErr } = await supabase.rpc("submit_product_review", { _product_id: product.id, _name: rName, _rating: rRating, _comment: rComment });
+      if (rErr) throw rErr;
       toast.success("Thanks for your review!");
       setRName(""); setRComment(""); setRRating(5);
       refetch();
