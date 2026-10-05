@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "bun run build",
+  "installCommand": "bun install",
+  "outputDirectory": ".output/public",
+  "env": {
+    "NITRO_PRESET": "vercel"
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}

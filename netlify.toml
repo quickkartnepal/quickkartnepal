@@ -1,0 +1,12 @@
+[build]
+  command = "bun run build"
+  publish = ".output/public"
+  functions = ".output/server"
+
+[build.environment]
+  NITRO_PRESET = "netlify"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
