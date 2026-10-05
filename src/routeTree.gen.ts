@@ -9,61 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ReturnPolicyRouteImport } from './routes/return-policy'
-import { Route as OrderSuccessRouteImport } from './routes/order-success'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CheckoutRouteImport } from './routes/checkout'
-import { Route as CartRouteImport } from './routes/cart'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AffiliateRouteImport } from './routes/affiliate'
-import { Route as AccountRouteImport } from './routes/account'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AffiliateIndexRouteImport } from './routes/affiliate.index'
-import { Route as RefUsernameRouteImport } from './routes/ref.$username'
-import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
-import { Route as AffiliateDashboardRouteImport } from './routes/affiliate.dashboard'
-import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AccountRouteImport } from './routes/account'
+import { Route as AffiliateRouteImport } from './routes/affiliate'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CartRouteImport } from './routes/cart'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as OrderSuccessRouteImport } from './routes/order-success'
+import { Route as ReturnPolicyRouteImport } from './routes/return-policy'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AffiliateIndexRouteImport } from './routes/affiliate.index'
+import { Route as AffiliateDashboardRouteImport } from './routes/affiliate.dashboard'
+import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
+import { Route as RefUsernameRouteImport } from './routes/ref.$username'
 
-const ReturnPolicyRoute = ReturnPolicyRouteImport.update({
-  id: '/return-policy',
-  path: '/return-policy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OrderSuccessRoute = OrderSuccessRouteImport.update({
-  id: '/order-success',
-  path: '/order-success',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutRoute = CheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CartRoute = CartRouteImport.update({
-  id: '/cart',
-  path: '/cart',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AffiliateRoute = AffiliateRouteImport.update({
-  id: '/affiliate',
-  path: '/affiliate',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AccountRoute = AccountRouteImport.update({
-  id: '/account',
-  path: '/account',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -71,9 +36,54 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AffiliateRoute = AffiliateRouteImport.update({
+  id: '/affiliate',
+  path: '/affiliate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrderSuccessRoute = OrderSuccessRouteImport.update({
+  id: '/order-success',
+  path: '/order-success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReturnPolicyRoute = ReturnPolicyRouteImport.update({
+  id: '/return-policy',
+  path: '/return-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AffiliateIndexRoute = AffiliateIndexRouteImport.update({
@@ -81,29 +91,19 @@ const AffiliateIndexRoute = AffiliateIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AffiliateRoute,
 } as any)
-const RefUsernameRoute = RefUsernameRouteImport.update({
-  id: '/ref/$username',
-  path: '/ref/$username',
-  getParentRoute: () => rootRouteImport,
+const AffiliateDashboardRoute = AffiliateDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AffiliateRoute,
 } as any)
 const ProductsSlugRoute = ProductsSlugRouteImport.update({
   id: '/products/$slug',
   path: '/products/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AffiliateDashboardRoute = AffiliateDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AffiliateRoute,
-} as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/admin/login',
-  path: '/admin/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminDashboardRoute = AdminDashboardRouteImport.update({
-  id: '/admin/dashboard',
-  path: '/admin/dashboard',
+const RefUsernameRoute = RefUsernameRouteImport.update({
+  id: '/ref/$username',
+  path: '/ref/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -236,60 +236,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/return-policy': {
-      id: '/return-policy'
-      path: '/return-policy'
-      fullPath: '/return-policy'
-      preLoaderRoute: typeof ReturnPolicyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/order-success': {
-      id: '/order-success'
-      path: '/order-success'
-      fullPath: '/order-success'
-      preLoaderRoute: typeof OrderSuccessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkout': {
-      id: '/checkout'
-      path: '/checkout'
-      fullPath: '/checkout'
-      preLoaderRoute: typeof CheckoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cart': {
-      id: '/cart'
-      path: '/cart'
-      fullPath: '/cart'
-      preLoaderRoute: typeof CartRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/affiliate': {
-      id: '/affiliate'
-      path: '/affiliate'
-      fullPath: '/affiliate'
-      preLoaderRoute: typeof AffiliateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/account': {
-      id: '/account'
-      path: '/account'
-      fullPath: '/account'
-      preLoaderRoute: typeof AccountRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -299,11 +250,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/affiliate': {
+      id: '/affiliate'
+      path: '/affiliate'
+      fullPath: '/affiliate'
+      preLoaderRoute: typeof AffiliateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/order-success': {
+      id: '/order-success'
+      path: '/order-success'
+      fullPath: '/order-success'
+      preLoaderRoute: typeof OrderSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/return-policy': {
+      id: '/return-policy'
+      path: '/return-policy'
+      fullPath: '/return-policy'
+      preLoaderRoute: typeof ReturnPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/affiliate/': {
@@ -313,12 +327,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AffiliateIndexRouteImport
       parentRoute: typeof AffiliateRoute
     }
-    '/ref/$username': {
-      id: '/ref/$username'
-      path: '/ref/$username'
-      fullPath: '/ref/$username'
-      preLoaderRoute: typeof RefUsernameRouteImport
-      parentRoute: typeof rootRouteImport
+    '/affiliate/dashboard': {
+      id: '/affiliate/dashboard'
+      path: '/dashboard'
+      fullPath: '/affiliate/dashboard'
+      preLoaderRoute: typeof AffiliateDashboardRouteImport
+      parentRoute: typeof AffiliateRoute
     }
     '/products/$slug': {
       id: '/products/$slug'
@@ -327,25 +341,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/affiliate/dashboard': {
-      id: '/affiliate/dashboard'
-      path: '/dashboard'
-      fullPath: '/affiliate/dashboard'
-      preLoaderRoute: typeof AffiliateDashboardRouteImport
-      parentRoute: typeof AffiliateRoute
-    }
-    '/admin/login': {
-      id: '/admin/login'
-      path: '/admin/login'
-      fullPath: '/admin/login'
-      preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/dashboard': {
-      id: '/admin/dashboard'
-      path: '/admin/dashboard'
-      fullPath: '/admin/dashboard'
-      preLoaderRoute: typeof AdminDashboardRouteImport
+    '/ref/$username': {
+      id: '/ref/$username'
+      path: '/ref/$username'
+      fullPath: '/ref/$username'
+      preLoaderRoute: typeof RefUsernameRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
