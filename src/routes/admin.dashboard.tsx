@@ -4,7 +4,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  changeAdminPassword,
   createSignedUpload,
   deleteBanner,
   deletePromo,
@@ -657,7 +656,10 @@ function PromosTab() {
 
 // ---------------- Settings (password change) ----------------
 function SettingsTab() {
-  const change = useServerFn(changeAdminPassword);
+  const change = async ({ data }: { data: { new_password: string } }) => {
+    const { error } = await supabase.auth.updateUser({ password: data.new_password });
+    if (error) throw error;
+  };
   const [pw, setPw] = useState("");
   const [busy, setBusy] = useState(false);
   return (
