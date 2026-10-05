@@ -559,6 +559,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_reset: { Args: { _scope: string }; Returns: undefined }
+      ensure_my_affiliate: {
+        Args: never
+        Returns: {
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "affiliates"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -591,6 +608,15 @@ export type Database = {
       request_affiliate_payment: {
         Args: { _amount: number; _full_name: string; _qr_path?: string }
         Returns: string
+      }
+      submit_product_review: {
+        Args: {
+          _comment: string
+          _name: string
+          _product_id: string
+          _rating: number
+        }
+        Returns: boolean
       }
       validate_checkout_promo: {
         Args: { _code: string; _subtotal: number }
