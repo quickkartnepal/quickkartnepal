@@ -6,7 +6,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 export const getAdminStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     await assertAdmin(context.supabase, context.userId);
 
     const [
@@ -136,7 +136,7 @@ export const createSignedUpload = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     await assertAdmin(context.supabase, context.userId);
     const safe = data.filename.replace(/[^a-zA-Z0-9._-]/g, "_");
     const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safe}`;
@@ -153,7 +153,7 @@ export const getSignedDownload = createServerFn({ method: "POST" })
     z.object({ bucket: z.enum(BUCKETS), path: z.string().min(1).max(400) }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     await assertAdmin(context.supabase, context.userId);
     const { data: signed, error } = await supabaseAdmin.storage
       .from(data.bucket)
@@ -191,7 +191,7 @@ export const upsertProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => productSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     await assertAdmin(context.supabase, context.userId);
     const { id, ...rest } = data;
     if (id) {
@@ -226,7 +226,7 @@ export const deleteProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     await assertAdmin(context.supabase, context.userId);
     const { error } = await supabaseAdmin.from("products").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
@@ -237,7 +237,7 @@ export const deleteProduct = createServerFn({ method: "POST" })
 export const listOrdersAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     await assertAdmin(context.supabase, context.userId);
     const { data: orders, error } = await supabaseAdmin
       .from("orders")
@@ -267,7 +267,7 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     await assertAdmin(context.supabase, context.userId);
     const { error } = await supabaseAdmin.from("orders").update({ status: data.status }).eq("id", data.id);
     if (error) throw new Error(error.message);
@@ -288,7 +288,7 @@ export const upsertBanner = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => bannerSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     await assertAdmin(context.supabase, context.userId);
     const { id, ...rest } = data;
     if (id) {
@@ -309,7 +309,7 @@ export const deleteBanner = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     await assertAdmin(context.supabase, context.userId);
     const { error } = await supabaseAdmin.from("banners").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
@@ -332,7 +332,7 @@ export const upsertPromo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => promoSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     await assertAdmin(context.supabase, context.userId);
     const { id, ...rest } = data;
     const payload = { ...rest, code: rest.code.toUpperCase() };
@@ -354,7 +354,7 @@ export const deletePromo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     await assertAdmin(context.supabase, context.userId);
     const { error } = await supabaseAdmin.from("promo_codes").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
@@ -368,7 +368,7 @@ export const resetAllDataAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ confirm: z.literal("RESET") }).parse(input))
   .handler(async ({ context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     await assertAdmin(context.supabase, context.userId);
     const { error } = await context.supabase.rpc("admin_reset" as any, { _scope: "all" } as any);
     if (error) throw new Error(error.message);
@@ -380,7 +380,7 @@ export const resetAffiliatesAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ confirm: z.literal("RESET") }).parse(input))
   .handler(async ({ context }) => {
-    const supabaseAdmin = context.supabase as any;
+    const supabaseAdmin = context.supabase;
     await assertAdmin(context.supabase, context.userId);
     const { error } = await context.supabase.rpc("admin_reset" as any, { _scope: "affiliates" } as any);
     if (error) throw new Error(error.message);
