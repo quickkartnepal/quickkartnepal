@@ -12,4 +12,13 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    define: {
+      // Public (publishable) connection values baked in at build time so the
+      // site deploys on Vercel/Netlify with zero environment-variable setup.
+      // These are the same public values the browser bundle already receives.
+      "process.env.SUPABASE_URL": JSON.stringify("https://kgnnxqsdftcnzuciqwbd.supabase.co"),
+      "process.env.SUPABASE_PUBLISHABLE_KEY": JSON.stringify("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtnbm54cXNkZnRjbnp1Y2lxd2JkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NDQwMjgsImV4cCI6MjA5NjEyMDAyOH0.dPseb7AILDNdh_7ATbDPoROFZeB1_edNHTX6DcYe3KU"),
+    },
+  },
 });
