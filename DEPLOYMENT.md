@@ -22,21 +22,19 @@ In Lovable: top-right **GitHub** button → Connect → Create repository → th
 
 ## Step 3 — Environment variables (required)
 
-Add these in Vercel/Netlify → Project Settings → Environment Variables:
+Add these in Vercel/Netlify → Project Settings → Environment Variables. Copy the values from the project's `.env` file:
 
 | Name | Value |
 | --- | --- |
-| `VITE_SUPABASE_URL` | your Lovable Cloud URL (from the project's `.env`) |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | the publishable key (from `.env`) |
-| `VITE_SUPABASE_PROJECT_ID` | the project id (from `.env`) |
+| `VITE_SUPABASE_URL` | the URL from `.env` |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | the publishable key from `.env` |
+| `VITE_SUPABASE_PROJECT_ID` | the project id from `.env` |
 | `SUPABASE_URL` | same URL as above |
 | `SUPABASE_PUBLISHABLE_KEY` | same key as above |
-| `SUPABASE_SERVICE_ROLE_KEY` | the secret service-role key — needed for admin panel, OTP, orders and affiliate features |
 
-Without `SUPABASE_SERVICE_ROLE_KEY`, the storefront loads but admin login, checkout and affiliate features fail with a "missing Supabase environment variable" error.
+No secret key is needed. Admin login, checkout, orders and the affiliate system all work with only these public values.
 
 ## Notes
 
-- The admin OTP email is sent by Lovable Cloud auth — it works on any host as long as the env vars above are set.
 - Every push to GitHub triggers a new deploy automatically on both platforms.
 - The Lovable published URL (nextokart.lovable.app) keeps working independently.
