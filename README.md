@@ -90,8 +90,8 @@ Important:
 - Admin login must be hidden in FOOTER of customer page
 
 Admin Login Credentials:
-Email: infoquickkartnepal@gmail.com  
-Password: Rgsbqkno$777  
+Email: supportnexto@gmail.com  
+Password: Managed securely through the admin account; never store it in project files.
 
 Admin panel features:
 - Add Product:
@@ -117,7 +117,7 @@ Include:
   9802649094
 
 - Email:
-  infoquickkartnepal@gmail.com
+  supportnexto@gmail.com
 
 - Instagram:
   quickkart_nepal
