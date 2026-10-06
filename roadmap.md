@@ -1,3 +1,4 @@
+- [x] Replace the broken header logo with the uploaded Nextokart logo and make brand image addresses work on external deployments.
 - [ ] Rebrand website as Nextokart with uploaded logo/banner and new contact links.
 - [ ] Improve Nepal checkout address and shoe quantity controls.
 - [ ] Show complete admin order and affiliate worker details.

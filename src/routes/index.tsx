@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard, type ProductCardData } from "@/components/site/ProductCard";
 import banner from "@/assets/nextokart-banner.png.asset.json";
+import { brandAssetUrl } from "@/lib/brand-assets";
 import { Truck, BadgeCheck, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -15,15 +16,17 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: "Shop shoes and electronics with Cash on Delivery all over Nepal." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:image", content: brandAssetUrl(banner.url) },
+      { name: "twitter:image", content: brandAssetUrl(banner.url) },
     ],
   }),
   component: Home,
 });
 
 const fallbackSlides = [
-  { title: "Shoes & Electronics", subtitle: "Curated picks delivered all over Nepal", image_url: banner.url, link_url: null as string | null },
-  { title: "Cash on Delivery", subtitle: "Pay only after you receive your order", image_url: banner.url, link_url: null },
-  { title: "Explore Nextokart", subtitle: "Hand-picked products everyone loves", image_url: banner.url, link_url: null },
+  { title: "Shoes & Electronics", subtitle: "Curated picks delivered all over Nepal", image_url: brandAssetUrl(banner.url), link_url: null as string | null },
+  { title: "Cash on Delivery", subtitle: "Pay only after you receive your order", image_url: brandAssetUrl(banner.url), link_url: null },
+  { title: "Explore Nextokart", subtitle: "Hand-picked products everyone loves", image_url: brandAssetUrl(banner.url), link_url: null },
 ];
 
 function useProducts() {
