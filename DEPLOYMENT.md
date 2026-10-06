@@ -20,19 +20,9 @@ In Lovable: top-right **GitHub** button → Connect → Create repository → th
 3. Add the environment variables below.
 4. Click Deploy.
 
-## Step 3 — Environment variables (required)
+## Step 3 — Nothing!
 
-Add these in Vercel/Netlify → Project Settings → Environment Variables. Copy the values from the project's `.env` file:
-
-| Name | Value |
-| --- | --- |
-| `VITE_SUPABASE_URL` | the URL from `.env` |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | the publishable key from `.env` |
-| `VITE_SUPABASE_PROJECT_ID` | the project id from `.env` |
-| `SUPABASE_URL` | same URL as above |
-| `SUPABASE_PUBLISHABLE_KEY` | same key as above |
-
-No secret key is needed. Admin login, checkout, orders and the affiliate system all work with only these public values.
+The public connection settings are baked into the build (see `vite.config.ts`), so you do NOT need to add any environment variables. Just click Deploy. Admin login, checkout, orders and the affiliate system all work as-is.
 
 ## Notes
 
