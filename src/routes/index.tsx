@@ -94,7 +94,7 @@ function HeroSlider() {
 
   const inner = (
     <div className="relative h-[300px] w-full sm:h-[420px] md:h-[520px]">
-      <img src={s.image_url} alt={s.title} className="absolute inset-0 h-full w-full object-cover" />
+      <img src={s.image_url} alt={s.title} fetchPriority={i === 0 ? "high" : "auto"} decoding="async" className="absolute inset-0 h-full w-full object-cover" />
       <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent" />
       <div className="relative mx-auto flex h-full max-w-7xl items-center px-4">
         <div className="max-w-xl">
