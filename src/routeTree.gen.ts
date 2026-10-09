@@ -19,6 +19,7 @@ import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as OrderSuccessRouteImport } from './routes/order-success'
 import { Route as ReturnPolicyRouteImport } from './routes/return-policy'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AffiliateIndexRouteImport } from './routes/affiliate.index'
@@ -76,6 +77,11 @@ const ReturnPolicyRoute = ReturnPolicyRouteImport.update({
   path: '/return-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/admin/dashboard',
   path: '/admin/dashboard',
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/order-success': typeof OrderSuccessRoute
   '/return-policy': typeof ReturnPolicyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
   '/affiliate/dashboard': typeof AffiliateDashboardRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/order-success': typeof OrderSuccessRoute
   '/return-policy': typeof ReturnPolicyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
   '/affiliate/dashboard': typeof AffiliateDashboardRoute
@@ -154,6 +162,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/order-success': typeof OrderSuccessRoute
   '/return-policy': typeof ReturnPolicyRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/login': typeof AdminLoginRoute
   '/affiliate/dashboard': typeof AffiliateDashboardRoute
@@ -174,6 +183,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/order-success'
     | '/return-policy'
+    | '/sitemap.xml'
     | '/admin/dashboard'
     | '/admin/login'
     | '/affiliate/dashboard'
@@ -191,6 +201,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/order-success'
     | '/return-policy'
+    | '/sitemap.xml'
     | '/admin/dashboard'
     | '/admin/login'
     | '/affiliate/dashboard'
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/order-success'
     | '/return-policy'
+    | '/sitemap.xml'
     | '/admin/dashboard'
     | '/admin/login'
     | '/affiliate/dashboard'
@@ -228,6 +240,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   OrderSuccessRoute: typeof OrderSuccessRoute
   ReturnPolicyRoute: typeof ReturnPolicyRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminLoginRoute: typeof AdminLoginRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
@@ -306,6 +319,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReturnPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/dashboard': {
       id: '/admin/dashboard'
       path: '/admin/dashboard'
@@ -376,6 +396,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   OrderSuccessRoute: OrderSuccessRoute,
   ReturnPolicyRoute: ReturnPolicyRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminLoginRoute: AdminLoginRoute,
   ProductsSlugRoute: ProductsSlugRoute,
