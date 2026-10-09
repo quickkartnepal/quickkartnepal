@@ -21,7 +21,11 @@ export const Route = createFileRoute("/affiliate/")({
         property: "og:description",
         content: "Earn Rs. 70 per product sold through your unique affiliate link.",
       },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://nextokart.lovable.app/affiliate" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://nextokart.lovable.app/affiliate" }],
   }),
   component: AffiliatePage,
 });

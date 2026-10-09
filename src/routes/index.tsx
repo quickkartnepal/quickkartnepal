@@ -18,6 +18,26 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:image", content: brandAssetUrl(banner.url) },
       { name: "twitter:image", content: brandAssetUrl(banner.url) },
+      { property: "og:url", content: "https://nextokart.lovable.app/" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://nextokart.lovable.app/" },
+      { rel: "preload", as: "image", href: brandAssetUrl(banner.url) },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "OnlineStore",
+          name: "Nextokart",
+          url: "https://nextokart.lovable.app/",
+          email: "supportnexto@gmail.com",
+          telephone: "+977-9802649094",
+          areaServed: "NP",
+          sameAs: ["https://www.instagram.com/nextokart/", "https://www.tiktok.com/@nextokart"],
+        }),
+      },
     ],
   }),
   component: Home,
@@ -74,7 +94,7 @@ function HeroSlider() {
 
   const inner = (
     <div className="relative h-[300px] w-full sm:h-[420px] md:h-[520px]">
-      <img src={s.image_url} alt={s.title} className="absolute inset-0 h-full w-full object-cover" />
+      <img src={s.image_url} alt={s.title} fetchPriority={i === 0 ? "high" : "auto"} decoding="async" className="absolute inset-0 h-full w-full object-cover" />
       <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent" />
       <div className="relative mx-auto flex h-full max-w-7xl items-center px-4">
         <div className="max-w-xl">

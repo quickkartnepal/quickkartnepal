@@ -1,12 +1,8 @@
+import { pageSeo } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/about")({
-  head: () => ({
-    meta: [
-      { title: "About — Nextokart" },
-      { name: "description", content: "Nextokart was founded by Suraj & Romeo to bring authentic Nepali products to every doorstep in Nepal with Cash on Delivery." },
-    ],
-  }),
+  head: () => pageSeo("/about", "About — Nextokart", "Nextokart was founded by Suraj & Romeo to bring authentic Nepali products to every doorstep in Nepal with Cash on Delivery."),
   component: About,
 });
 
