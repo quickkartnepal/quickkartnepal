@@ -4,7 +4,7 @@ import { getDeliveryCharge, STANDARD_DELIVERY } from "@/lib/delivery";
 import { Minus, Plus, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/cart")({
-  head: () => ({ meta: [{ title: "Your Cart — Nextokart" }] }),
+  head: () => ({ meta: [{ title: "Your Cart — Nextokart" }, { name: "robots", content: "noindex" }] }),
   component: CartPage,
 });
 

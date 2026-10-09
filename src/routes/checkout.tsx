@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { PROVINCES, districtsOf, municipalitiesOf, wardsOf } from "@/lib/nepal-address";
 
 export const Route = createFileRoute("/checkout")({
-  head: () => ({ meta: [{ title: "Checkout — Nextokart" }] }),
+  head: () => ({ meta: [{ title: "Checkout — Nextokart" }, { name: "robots", content: "noindex" }] }),
   component: CheckoutPage,
 });
 
