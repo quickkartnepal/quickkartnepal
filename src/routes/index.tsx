@@ -18,6 +18,26 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:image", content: brandAssetUrl(banner.url) },
       { name: "twitter:image", content: brandAssetUrl(banner.url) },
+      { property: "og:url", content: "https://nextokart.lovable.app/" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://nextokart.lovable.app/" },
+      { rel: "preload", as: "image", href: brandAssetUrl(banner.url) },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "OnlineStore",
+          name: "Nextokart",
+          url: "https://nextokart.lovable.app/",
+          email: "supportnexto@gmail.com",
+          telephone: "+977-9802649094",
+          areaServed: "NP",
+          sameAs: ["https://www.instagram.com/nextokart/", "https://www.tiktok.com/@nextokart"],
+        }),
+      },
     ],
   }),
   component: Home,

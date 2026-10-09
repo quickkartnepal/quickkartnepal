@@ -27,12 +27,56 @@ function formatDescription(text: string | null | undefined): string[] {
 
 
 export const Route = createFileRoute("/products/$slug")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `${params.slug} — Nextokart` },
-      { name: "description", content: "Buy authentic Nepali products with Cash on Delivery all over Nepal." },
-    ],
-  }),
+  loader: async ({ params }) => {
+    try {
+      const { data } = await supabase
+        .from("products")
+        .select("name,description,price,discount_price,images")
+        .eq("slug", params.slug)
+        .eq("is_active", true)
+        .maybeSingle();
+      return { seo: data as any };
+    } catch {
+      return { seo: null as any };
+    }
+  },
+  head: ({ params, loaderData }) => {
+    const p = loaderData?.seo;
+    const url = `https://nextokart.lovable.app/products/${params.slug}`;
+    const title = p?.name ? `${p.name} — Nextokart` : `${params.slug.replace(/-/g, " ")} — Nextokart`;
+    const desc = p?.description
+      ? String(p.description).replace(/\s+/g, " ").slice(0, 155)
+      : "Buy with Cash on Delivery all over Nepal. Flat Rs. 150 delivery.";
+    const img: string | undefined = Array.isArray(p?.images) && typeof p.images[0] === "string" && p.images[0].startsWith("https://") ? p.images[0] : undefined;
+    const price = p ? (p.discount_price ?? p.price) : undefined;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "product" },
+        { property: "og:url", content: url },
+        { name: "twitter:card", content: "summary_large_image" },
+        ...(img ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: p
+        ? [{
+            type: "application/ld+json",
+            children: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Product",
+              name: p.name,
+              description: desc,
+              ...(img ? { image: [img] } : {}),
+              brand: { "@type": "Brand", name: "Nextokart" },
+              offers: { "@type": "Offer", url, priceCurrency: "NPR", price, availability: "https://schema.org/InStock" },
+            }),
+          }]
+        : [],
+    };
+  },
   component: ProductPage,
 });
 
