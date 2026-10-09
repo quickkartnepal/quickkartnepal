@@ -1,12 +1,8 @@
+import { pageSeo } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/return-policy")({
-  head: () => ({
-    meta: [
-      { title: "Return & Refund Policy — Nextokart" },
-      { name: "description", content: "Clear return & refund policy for Nextokart Cash on Delivery orders." },
-    ],
-  }),
+  head: () => pageSeo("/return-policy", "Return & Refund Policy — Nextokart", "Clear return & refund policy for Nextokart Cash on Delivery orders."),
   component: Policy,
 });
 

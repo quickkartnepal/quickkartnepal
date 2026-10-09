@@ -1,13 +1,9 @@
+import { pageSeo } from "@/lib/seo";
 import { createFileRoute } from "@tanstack/react-router";
 import { Instagram, Mail, Music2, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({
-    meta: [
-      { title: "Contact — Nextokart" },
-      { name: "description", content: "Get in touch with Nextokart via email, Instagram, or TikTok." },
-    ],
-  }),
+  head: () => pageSeo("/contact", "Contact — Nextokart", "Get in touch with Nextokart via email, Instagram, or TikTok."),
   component: Contact,
 });
 
